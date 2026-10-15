@@ -315,6 +315,9 @@ body {
 .story { font-size: 16px; text-align: center; margin: 4px 8px 8px; }
 
 /* ---------- easter egg ---------- */
+/* no double-tap zoom on the title, and a bigger invisible tap area around the "g" */
+.modal h1.logo { touch-action: manipulation; }
+.egg-g { display: inline-block; padding: 10px 6px; margin: -10px -6px; -webkit-touch-callout: none; }
 .love-rain { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; transition: opacity .3s steps(3); }
 .love-rain.fade { opacity: 0; }
 .love-rain > span { position: absolute; top: -48px; animation: heartfall 1.2s linear forwards; }

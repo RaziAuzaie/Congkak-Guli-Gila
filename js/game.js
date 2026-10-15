@@ -1299,8 +1299,13 @@
     `);
   }
 
+  // Easter egg taps count on pointerdown: on phones, quick repeated taps never
+  // become clicks (the browser treats them as double-tap zoom).
+  modal.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.egg-g')) eggTap();
+  });
+
   modal.addEventListener('click', (e) => {
-    if (e.target.closest('.egg-g')) { eggTap(); return; }
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
     ac();
@@ -1370,7 +1375,7 @@
   let eggTaps = 0, eggTimer = null, eggOn = false;
   function eggTap() {
     clearTimeout(eggTimer);
-    eggTimer = setTimeout(() => { eggTaps = 0; }, 1200);
+    eggTimer = setTimeout(() => { eggTaps = 0; }, 1500);
     if (++eggTaps >= 3) { eggTaps = 0; loveRain(); }
   }
 
