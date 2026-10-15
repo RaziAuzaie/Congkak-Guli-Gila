@@ -1203,7 +1203,7 @@
         <button type="button" class="btn primary" data-act="new">${inGame ? t('newGame') : t('play')}</button>`;
     }
     openModal(`
-      <h1 class="logo">Congkak</h1>
+      <h1 class="logo">Con<span class="egg-g">g</span>kak</h1>
       <p class="tagline">${t('tagline')}</p>
       <div class="field"><label>${t('mode')}</label>${seg('mode', [['ai', t('vsAI')], ['pvp', t('pvp')], ['rogue', t('rogue')]])}</div>
       ${settings.mode === 'ai' ? `<div class="field"><label>${t('level')}</label>${seg('level', [['easy', t('easy')], ['medium', t('medium')], ['hard', t('hard')]])}</div>` : ''}
@@ -1300,6 +1300,7 @@
   }
 
   modal.addEventListener('click', (e) => {
+    if (e.target.closest('.egg-g')) { eggTap(); return; }
     const b = e.target.closest('button');
     if (!b || b.disabled) return;
     ac();
@@ -1363,6 +1364,53 @@
       case 'victory': showRunEnd(true); break;
     }
   });
+
+  // ---------- Easter egg ----------
+  // Tap the "g" in the menu's Congkak title 3 times quickly: 2 s of falling hearts, then a message for 2 s.
+  let eggTaps = 0, eggTimer = null, eggOn = false;
+  function eggTap() {
+    clearTimeout(eggTimer);
+    eggTimer = setTimeout(() => { eggTaps = 0; }, 1200);
+    if (++eggTaps >= 3) { eggTaps = 0; loveRain(); }
+  }
+
+  function loveRain() {
+    if (eggOn) return;
+    eggOn = true;
+    ac();
+    const layer = document.createElement('div');
+    layer.className = 'love-rain';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(layer);
+    const colors = ['#ff5d8f', '#ff8fb1', '#ffc2d4', '#ff3d6e', '#f2c14e'];
+    const spawn = setInterval(() => {
+      for (let k = 0; k < 2; k++) {
+        const h = document.createElement('span');
+        h.innerHTML = pxSvg(ICONS.heart, colors[Math.floor(Math.random() * colors.length)], 'heart');
+        const size = 14 + Math.floor(Math.random() * 4) * 7;
+        h.style.left = (Math.random() * 100).toFixed(1) + 'vw';
+        h.style.width = h.style.height = size + 'px';
+        h.style.animationDuration = (0.9 + Math.random() * 0.8).toFixed(2) + 's';
+        h.addEventListener('animationend', () => h.remove());
+        layer.appendChild(h);
+      }
+    }, 60);
+    sfx('magic');
+    setTimeout(() => {
+      clearInterval(spawn);
+      const msg = document.createElement('div');
+      msg.className = 'love-msg';
+      msg.setAttribute('role', 'status');
+      msg.textContent = 'I love u Hannah my sayang';
+      layer.removeAttribute('aria-hidden');
+      layer.appendChild(msg);
+      sfx('win');
+      setTimeout(() => {
+        layer.classList.add('fade');
+        setTimeout(() => { layer.remove(); eggOn = false; }, 300);
+      }, 2000);
+    }, 2000);
+  }
 
   $('#btnMenu').addEventListener('click', showMenu);
   $('#btnRules').addEventListener('click', () => (rogue() ? showRogueRules(false) : showRules(false)));

@@ -314,8 +314,28 @@ body {
 .choices .btn { font-size: 16px; font-weight: 600; }
 .story { font-size: 16px; text-align: center; margin: 4px 8px 8px; }
 
+/* ---------- easter egg ---------- */
+.love-rain { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; transition: opacity .3s steps(3); }
+.love-rain.fade { opacity: 0; }
+.love-rain > span { position: absolute; top: -48px; animation: heartfall 1.2s linear forwards; }
+.love-rain > span svg { display: block; width: 100%; height: 100%; }
+@keyframes heartfall { to { transform: translateY(calc(100vh + 96px)); } }
+.love-msg {
+  --bd: #ff5d8f;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: max-content; max-width: calc(100vw - 48px);
+  padding: 14px 24px 18px; background: var(--ink); color: #ff8fb1;
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 6vw, 54px);
+  line-height: 1.15; text-align: center; text-shadow: 4px 4px 0 #5a1830;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--bd), 0 var(--px) 0 0 var(--bd),
+    calc(-1 * var(--px)) 0 0 0 var(--bd), var(--px) 0 0 0 var(--bd);
+  animation: pop .35s steps(3);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fireflies i { animation: none; opacity: .5; }
+  .love-msg { animation: none; }
   .player-bar.active .name::before { animation: none; }
   .toast.show, .combo.show, .node.avail, .hud-hp.low b { animation: none; }
 }
