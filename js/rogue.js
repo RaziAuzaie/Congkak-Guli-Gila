@@ -88,6 +88,38 @@
     },
   };
 
+  // ---------- heroes (chosen at the start of a run; powers not active yet) ----------
+  const HEROES = {
+    tuah: {
+      name: 'Hang Tuah',
+      style: L('Pencuri kombo — seimbang, sesuai untuk permulaan', 'Combo thief — balanced, a good first pick'),
+      passive: L('Keris Taming Sari: setiap hit kombo ke-2 dalam giliran anda mencuri 1 buah dari rumah lawan (maks 3 setiap giliran).',
+        'Keris Taming Sari: every 2nd combo hit in your turn steals 1 seed from the opponent’s rumah (max 3 per turn).'),
+      second: null,
+      weakness: L('Tiada — serba boleh.', 'None — the all-rounder.'),
+      stats: { hp: 40, coins: 15, slots: 3, items: 2 },
+    },
+    mahsuri: {
+      name: 'Mahsuri',
+      style: L('Bangkit semula dan sumpahan', 'Comeback and curses'),
+      passive: L('Darah Putih: kali pertama semangat anda jatuh ke 0, anda hidup semula dengan 15 semangat (sekali setiap pengembaraan).',
+        'Darah Putih: the first time your spirit would hit 0, survive and recover 15 (once per run).'),
+      second: L('Sumpahan Mahsuri: selepas anda kalah, lawan seterusnya bermula dengan kampung terdekat rumahnya hangus.',
+        'Sumpahan Mahsuri: after you lose a match, your next opponent starts with their hole nearest their rumah burnt.'),
+      weakness: L('Rapuh — mesti kalah dengan bijak dan bangkit semula.', 'Fragile — has to lose well and bounce back.'),
+      stats: { hp: 35, coins: 25, slots: 3, items: 2 },
+    },
+    badang: {
+      name: 'Badang',
+      style: L('Kekuatan mentah', 'Raw power'),
+      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dan bukan 1.',
+        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds there instead of 1.'),
+      second: null,
+      weakness: L('Guli sedikit — menang dengan kekuatan, bukan helah.', 'Fewer marbles — wins by strength, not tricks.'),
+      stats: { hp: 50, coins: 10, slots: 2, items: 1 },
+    },
+  };
+
   // ---------- opponents ----------
   const MODS = {
     licik: L('Licik: setiap kampungnya bermula dengan 1 buah lebih.', 'Cunning: each of its holes starts with 1 extra seed.'),
@@ -245,9 +277,9 @@
   }
 
   // ---------- run ----------
-  function newRun(rnd = Math.random) {
+  function newRun(rnd = Math.random, hero = null) {
     const run = {
-      v: 1, area: 0,
+      v: 1, area: 0, hero,
       hp: START.hp, maxHp: START.hp, coins: START.coins,
       slots: START.slots, items: [],
       at: null, path: [], done: false, won: false,
@@ -517,7 +549,7 @@
   function randomEvent(rnd) { return pick(Object.keys(EVENTS), rnd); }
 
   const api = {
-    START, MAX_SLOTS, ROWS, COLS, ITEMS, MODS, ENEMIES, AREAS, REST, EVENTS,
+    START, MAX_SLOTS, ROWS, COLS, ITEMS, HEROES, MODS, ENEMIES, AREAS, REST, EVENTS,
     newRun, nextArea, genMap, available, visit, nodeById,
     makeMatch, finishMatch, hitValue, damageFor, itemTargets, useItem,
     makeShop, buy, randomEvent, randomItem, addItem, hasSlot, heal, earn,

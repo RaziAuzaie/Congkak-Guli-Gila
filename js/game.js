@@ -74,6 +74,8 @@
       st_wins: 'Perlawanan dimenangi', st_coins: 'Syiling dikumpul', st_combo: 'Kombo terbaik', st_items: 'Guli digunakan',
       shopTitle: 'Kedai Guli', buy: 'Beli', sold: 'Habis', healOffer: 'Ubat (+{n} semangat)', slotOffer: '+1 ruang beg',
       leave: 'Keluar', backToMap: 'Kembali ke peta',
+      chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
+      lbl_weak: 'Kelemahan', lbl_bag: 'Beg', heroSoon: 'Kuasa wira akan datang. Buat masa ini semua wira bermain sama.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
       use: 'Guna', cancel: 'Batal',
@@ -163,6 +165,8 @@
       st_wins: 'Matches won', st_coins: 'Coins earned', st_combo: 'Best combo', st_items: 'Marbles used',
       shopTitle: 'Marble Shop', buy: 'Buy', sold: 'Sold', healOffer: 'Medicine (+{n} spirit)', slotOffer: '+1 bag slot',
       leave: 'Leave', backToMap: 'Back to map',
+      chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
+      lbl_weak: 'Weakness', lbl_bag: 'Bag', heroSoon: 'Hero powers are coming soon. For now every hero plays the same.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
       use: 'Use', cancel: 'Cancel',
@@ -274,6 +278,65 @@
     return `<svg class="${cls || 'pxi'}" viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
   }
   const icon = (name) => pxSvg(ICONS[name], 'currentColor');
+
+  // ---------- Hero portraits (faceless 8-bit, one palette letter per pixel) ----------
+  const HERO_ART = {
+    tuah: {
+      pal: { k: '#1a0d05', s: '#c98a5a', S: '#9a6238', t: '#b8322c', g: '#f2c14e', b: '#2b2b3a', B: '#4a4a62',
+        r: '#8e1f1f', w: '#d6dde2', h: '#6b3e1e', p: '#3a2a1a' },
+      grid: [
+        '.......kkk........', '......kgttk.......', '.....kttgttk......', '....kttttttgk.....',
+        '....kkkkkkkkk.....', '....ksssssssk.....', '....kssssssSk.....', '....kssssssSk.....',
+        '.....ksssssk......', '......kssk........', '....kkbbbbkk......', '...kbbbBbbbbk.....',
+        '..kbbbbBbbbbbk....', '..kbkbbBbbbkbbkk..', '..kbkbbBbbbkksssk.', '..ksk.bbbbk..kshhk',
+        '..ksk.bbbbk...kwwk', '..kkkrrrrrrk..kwk.', '...krgrrgrrk..kw..', '...krrrrrrrk...k..',
+        '...kppppppppk.....', '...kpppkkpppk.....', '...kppk..kppk.....', '...kssk..kssk.....',
+        '..kkssk..ksskk....', '..kkkkk..kkkkk....',
+      ],
+    },
+    mahsuri: {
+      pal: { k: '#1a0d05', s: '#d9a273', S: '#a8724a', h: '#1a1a24', y: '#e8c15a', m: '#7a3b6e', M: '#9c5590',
+        n: '#f2c14e' },
+      grid: [
+        '......kkkkk.......', '.....khhhhhk......', '....khyyyyyhk.....', '....kyssssyyk.....',
+        '...kyysssssyk.....', '...kyysssssSyk....', '...kyyssssSyyk....', '...kyyysssyyyk....',
+        '...kyyyyyyyyyk....', '...kymmmmmmmyk....', '..kymmMmmmMmmyk...', '..kymmMmmmMmmyk...',
+        '..kmmmMmmmMmmmk...', '..ksmmmmmmmmmsk...', '..ksmmmmmmmmmsk...', '...kmmmmmmmmmk....',
+        '...knnnnnnnnnk....', '...kmmmmmmmmmk....', '...kmmnmmmnmmk....', '...kmmmmmmmmmk....',
+        '...kmmnmmmnmmk....', '...kmmmmmmmmmk....', '..kmmmmmmmmmmmk...', '..ksskkkkkkkssk...',
+        '..kkk.......kkk...',
+      ],
+    },
+    badang: {
+      pal: { k: '#1a0d05', s: '#b8794a', S: '#8a5430', h: '#1a1a24', g: '#f2c14e', r: '#b23b2e', c: '#3f7d4e',
+        o: '#8a8f99', O: '#5c606a' },
+      grid: [
+        '...kkkkkkkkk......', '..koooOoooooOk....', '.kooOooooOoooOk...', '.koooooOoooooOk...',
+        '..kOooooooOOOk....', '...kkkkkkkkkk.....', '..ks.khhhhk.sk....', '..ks.kggggk.sk....',
+        '..ks.ksssSk.sk....', '..ks.ksssSk.sk....', '..kss.kssk.ssk....', '..ksssssssssssk...',
+        '..kssSsssssSssk...', '...ksSsssssSsk....', '...kssssssssk.....', '....ksssSsssk.....',
+        '....kggggggggk....', '....krrcrrcrrk....', '....krrrrrrrrk....', '....krrcrrcrrk....',
+        '....kssk..kssk....', '....kssk..kssk....', '...kkssk..ksskk...', '...kkkkk..kkkkk...',
+      ],
+    },
+  };
+
+  /** Multi-colour pixel art: each run of same-colour pixels becomes one rect. */
+  function heroSvg(id, cls) {
+    const { pal, grid } = HERO_ART[id];
+    const w = Math.max(...grid.map((r) => r.length));
+    let rects = '';
+    grid.forEach((row, y) => {
+      for (let x = 0; x < row.length;) {
+        const ch = row[x];
+        let n = 1;
+        while (row[x + n] === ch) n++;
+        if (pal[ch]) rects += `<rect x="${x}" y="${y}" width="${n}" height="1" fill="${pal[ch]}"/>`;
+        x += n;
+      }
+    });
+    return `<svg class="${cls || 'hero-art'}" viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
+  }
   const marble = (id) => pxSvg(MARBLE, R.ITEMS[id].color, 'marble');
 
   // ---------- Board ----------
@@ -837,11 +900,43 @@
   }
 
   // ---------- Roguelite: run flow ----------
-  function startRun() {
+  function startRun() { showHeroSelect(); }
+
+  function beginRun(hero) {
     rogueReturn = null;
-    run = R.newRun();
+    run = R.newRun(Math.random, hero);
     mode = 'rogue';
     showMap();
+  }
+
+  function showHeroSelect() {
+    const cards = Object.keys(R.HEROES).map((id) => {
+      const h = R.HEROES[id];
+      const st = h.stats;
+      return `<div class="hero-card">
+        <div class="hero-portrait">${heroSvg(id)}</div>
+        <h3>${esc(h.name)}</h3>
+        <p class="hero-style">${esc(tx(h.style))}</p>
+        <dl class="hero-info">
+          <dt>${t('lbl_passive')}</dt><dd>${esc(tx(h.passive))}</dd>
+          <dt>${t('lbl_second')}</dt><dd>${h.second ? esc(tx(h.second)) : '—'}</dd>
+          <dt>${t('lbl_weak')}</dt><dd>${esc(tx(h.weakness))}</dd>
+        </dl>
+        <div class="hero-stats">
+          <span title="${t('spirit')}">${icon('heart')}${st.hp}</span>
+          <span title="${t('coins')}">${icon('coin')}${st.coins}</span>
+          <span title="${t('lbl_bag')}">${icon('shop')}${st.slots}</span>
+        </div>
+        <button type="button" class="btn primary small" data-hero="${id}">${t('pick')}</button>
+      </div>`;
+    }).join('');
+    openModal(`
+      <h2>${t('chooseHero')}</h2>
+      <div class="heroes">${cards}</div>
+      <p class="note">${t('heroSoon')}</p>
+      <div class="actions"><button type="button" class="btn ghost" data-act="menu">${t('back')}</button></div>
+    `, 'heroes-modal');
+    screen = 'menu';
   }
 
   /** Back to the run: the match in progress, the screen the menu was opened from, or the last save. */
@@ -899,7 +994,7 @@
 
   function runHead(title) {
     return `<div class="run-head">
-      <div class="run-title">${title}</div>
+      <div class="run-title">${run.hero && R.HEROES[run.hero] ? heroSvg(run.hero, 'hero-mini') : ''}${title}</div>
       <div class="hud">${hudHtml()}</div>
     </div>`;
   }
@@ -1349,6 +1444,7 @@
       return;
     }
     if (d.node) { enterNode(d.node); return; }
+    if (d.hero) { beginRun(d.hero); return; }
     if (d.take) { R.addItem(run, d.take); afterReward(); return; }
     if (d.drop !== undefined) {
       run.items.splice(Number(d.drop), 1);
