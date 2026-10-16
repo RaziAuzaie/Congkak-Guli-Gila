@@ -317,8 +317,11 @@ body {
 /* ---------- hero select ---------- */
 .modal.heroes-modal { width: min(100%, 860px); }
 .heroes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 6px var(--px) 4px; }
+/* Each card spans the same 11 rows of the parent grid (subgrid), so portrait, name, style,
+   each label and text, stats and button line up across all cards. */
 .hero-card {
-  --bd: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 6px;
+  --bd: var(--ink); display: grid; grid-row: span 11; grid-template-rows: subgrid; row-gap: 4px;
+  justify-items: center;
   background: var(--panel-hi); padding: 14px 12px;
   box-shadow:
     0 calc(-1 * var(--px)) 0 0 var(--bd), 0 var(--px) 0 0 var(--bd),
@@ -329,18 +332,18 @@ body {
   width: 100%; display: grid; place-items: center; padding: 10px 0 6px;
   background: linear-gradient(180deg, #1b2a20 0 60%, #23382a 60%);
 }
-.hero-art { width: 90px; height: auto; display: block; }
+.hero-art { height: 112px; width: auto; display: block; }
 .hero-card h3 { margin: 4px 0 0; font-size: 20px; color: var(--gold); text-shadow: 2px 2px 0 var(--ink); }
 .hero-style { margin: 0; font-size: 13.5px; color: var(--muted); text-align: center; }
-.hero-info { margin: 4px 0; width: 100%; font-size: 13.5px; line-height: 1.35; }
-.hero-info dt { font-family: var(--font-label); font-size: 10px; letter-spacing: .08em; color: var(--muted); margin-top: 8px; }
-.hero-info dd { margin: 2px 0 0; }
-.hero-stats { display: flex; gap: 16px; font-size: 16px; font-weight: 600; margin: 4px 0 8px; }
+.hero-info { display: contents; }
+.hero-info dt { justify-self: stretch; align-self: end; font-family: var(--font-label); font-size: 10px; letter-spacing: .08em; color: var(--muted); margin-top: 8px; }
+.hero-info dd { justify-self: stretch; align-self: start; margin: 0; font-size: 13.5px; line-height: 1.35; }
+.hero-stats { display: flex; gap: 16px; font-size: 16px; font-weight: 600; margin: 8px 0 6px; align-self: end; }
 .hero-stats span { display: inline-flex; align-items: center; gap: 5px; }
 .hero-stats span:nth-child(1) { color: var(--red); }
 .hero-stats span:nth-child(2) { color: var(--gold); }
 .hero-stats span:nth-child(3) { color: var(--muted); }
-.hero-card .btn { width: 100%; justify-content: center; margin-top: auto; }
+.hero-card .btn { justify-self: stretch; justify-content: center; }
 .run-title { display: flex; align-items: center; gap: 10px; }
 .hero-mini { width: 22px; height: auto; flex: none; }
 
