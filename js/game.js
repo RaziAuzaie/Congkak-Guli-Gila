@@ -859,6 +859,9 @@
     run = loadRun();
     if (!run) { startRun(); return; }
     mode = 'rogue';
+    // A mystery that was opened but not answered before the game closed
+    const here = run.at && R.nodeById(run, run.at);
+    if (here && here.type === 'event' && here.done === false) { leaveMatch(); showEvent(here); return; }
     showMap();
   }
 
@@ -955,13 +958,21 @@
   }
 
   // Opening a node only looks at it; it counts as visited once you commit
-  // (fight, buy, pick a rest or event option). Until then Back returns to the map.
+  // (fight, buy, pick a rest option). Until then Back returns to the map.
+  // A mystery is the exception: opening it commits, so its options can't be scouted.
   function enterNode(id) {
     const node = R.nodeById(run, id);
     if (!R.available(run).some((n) => n.id === id)) return;
     if (node.type === 'shop') showShop(node);
     else if (node.type === 'rest') showRest(node);
-    else if (node.type === 'event') showEvent(node);
+    else if (node.type === 'event') {
+      // pick and save the event now, so reloading can't reroll or skip it
+      if (!node.event) node.event = R.randomEvent(Math.random);
+      node.done = false;
+      commitNode(node);
+      saveRun();
+      showEvent(node);
+    }
     else showIntro(node);
   }
 
@@ -1168,7 +1179,6 @@
       <div class="choices">
         ${ev.choices.map((c, k) => `<button type="button" class="btn ghost" data-choice="${k}" ${c.can(run) ? '' : 'disabled'}>${esc(tx(c.label))}</button>`).join('')}
       </div>
-      ${backButton()}
     `);
     eventNode = node;
   }
@@ -1361,6 +1371,7 @@
     }
     if (d.choice !== undefined) {
       commitNode(eventNode);
+      eventNode.done = true;
       const ev = R.EVENTS[eventNode.event];
       const msg = ev.choices[Number(d.choice)].go(run, Math.random);
       if (msg) showMessage(tx(ev.title), tx(msg));
