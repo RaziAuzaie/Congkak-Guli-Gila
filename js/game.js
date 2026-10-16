@@ -73,7 +73,7 @@
       runOver: 'Pengembaraan tamat', runOverText: 'Semangat anda habis di {name}.',
       st_wins: 'Perlawanan dimenangi', st_coins: 'Syiling dikumpul', st_combo: 'Kombo terbaik', st_items: 'Guli digunakan',
       shopTitle: 'Kedai Guli', buy: 'Beli', sold: 'Habis', healOffer: 'Ubat (+{n} semangat)', slotOffer: '+1 ruang beg',
-      leave: 'Keluar',
+      leave: 'Keluar', backToMap: 'Kembali ke peta',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
       use: 'Guna', cancel: 'Batal',
@@ -162,7 +162,7 @@
       runOver: 'Run over', runOverText: 'Your spirit ran out in {name}.',
       st_wins: 'Matches won', st_coins: 'Coins earned', st_combo: 'Best combo', st_items: 'Marbles used',
       shopTitle: 'Marble Shop', buy: 'Buy', sold: 'Sold', healOffer: 'Medicine (+{n} spirit)', slotOffer: '+1 bag slot',
-      leave: 'Leave',
+      leave: 'Leave', backToMap: 'Back to map',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
       use: 'Use', cancel: 'Cancel',
@@ -954,15 +954,22 @@
     `, 'wide');
   }
 
+  // Opening a node only looks at it; it counts as visited once you commit
+  // (fight, buy, pick a rest or event option). Until then Back returns to the map.
   function enterNode(id) {
     const node = R.nodeById(run, id);
     if (!R.available(run).some((n) => n.id === id)) return;
-    R.visit(run, node);
     if (node.type === 'shop') showShop(node);
-    else if (node.type === 'rest') showRest();
+    else if (node.type === 'rest') showRest(node);
     else if (node.type === 'event') showEvent(node);
     else showIntro(node);
   }
+
+  function commitNode(node) {
+    if (run.at !== node.id) R.visit(run, node);
+  }
+  const committed = (node) => run.at === node.id;
+  const backButton = () => `<div class="actions"><button type="button" class="btn ghost" data-act="map">${t('backToMap')}</button></div>`;
 
   function showIntro(node) {
     const m = R.makeMatch(run, node);
@@ -978,13 +985,17 @@
       <p class="note">${t('skill')}: <span class="stars">${stars}</span></p>
       ${mods ? `<ul class="mods">${mods}</ul>` : ''}
       <p class="note">${t('youFirst')}</p>
-      <div class="actions"><button type="button" class="btn primary" data-act="fight">${t('fight')}</button></div>
+      <div class="actions">
+        ${committed(node) ? '' : `<button type="button" class="btn ghost" data-act="map">${t('backToMap')}</button>`}
+        <button type="button" class="btn primary" data-act="fight">${t('fight')}</button>
+      </div>
     `);
   }
   let pendingMatch = null;
 
   function startMatch() {
     const { m, node } = pendingMatch;
+    commitNode(node);
     gen++;
     mode = 'rogue';
     match = { m, node, combo: 0, coins: 0, gold: false };
@@ -1128,22 +1139,25 @@
       </div>
       ${full ? `<p class="note warn">${t('bagFull')}</p>` : ''}
       ${bagHtml(true)}
-      <div class="actions"><button type="button" class="btn ghost" data-act="map">${t('leave')}</button></div>
+      <div class="actions"><button type="button" class="btn ghost" data-act="map">${committed(node) ? t('leave') : t('backToMap')}</button></div>
     `);
     shopNode = node;
     screen = 'shop';
   }
   let shopNode = null;
 
-  function showRest() {
+  function showRest(node) {
     openModal(`
       ${runHead(t('restTitle'))}
       <p class="note">${t('restText')}</p>
       <div class="choices">
         ${R.REST.map((o, k) => `<button type="button" class="btn ghost" data-rest="${k}" ${o.can(run) ? '' : 'disabled'}>${esc(tx(o.label(run)))}</button>`).join('')}
       </div>
+      ${backButton()}
     `);
+    restNode = node;
   }
+  let restNode = null;
 
   function showEvent(node) {
     if (!node.event) node.event = R.randomEvent(Math.random);
@@ -1154,6 +1168,7 @@
       <div class="choices">
         ${ev.choices.map((c, k) => `<button type="button" class="btn ghost" data-choice="${k}" ${c.can(run) ? '' : 'disabled'}>${esc(tx(c.label))}</button>`).join('')}
       </div>
+      ${backButton()}
     `);
     eventNode = node;
   }
@@ -1333,12 +1348,19 @@
     }
     if (d.buy !== undefined) {
       const what = /^\d+$/.test(d.buy) ? Number(d.buy) : d.buy;
-      if (R.buy(run, shopNode.shop, what)) sfx('coin');
+      if (R.buy(run, shopNode.shop, what)) { commitNode(shopNode); sfx('coin'); }
       showShop(shopNode);
       return;
     }
-    if (d.rest !== undefined) { R.REST[Number(d.rest)].go(run, Math.random); sfx('magic'); showMap(); return; }
+    if (d.rest !== undefined) {
+      commitNode(restNode);
+      R.REST[Number(d.rest)].go(run, Math.random);
+      sfx('magic');
+      showMap();
+      return;
+    }
     if (d.choice !== undefined) {
+      commitNode(eventNode);
       const ev = R.EVENTS[eventNode.event];
       const msg = ev.choices[Number(d.choice)].go(run, Math.random);
       if (msg) showMessage(tx(ev.title), tx(msg));
