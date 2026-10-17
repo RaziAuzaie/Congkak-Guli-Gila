@@ -412,7 +412,12 @@
       }
       return -1;
     }
-    // Hover previews are for mouse and pen; a touch tap plays straight away
+    // Hover previews are for mouse and pen; on touch, game.js previews on the first tap
+    let touch = false; // was the last press a finger?
+    canvas.addEventListener('pointerdown', (e) => {
+      touch = e.pointerType === 'touch';
+      if (touch) { b.hover = pitAt(e); b.keyboard = false; } // the tapped hole lights up
+    });
     const hoverTo = (i) => { if (opts.onHover) opts.onHover(i); };
     canvas.addEventListener('pointermove', (e) => {
       const i = pitAt(e);
@@ -429,7 +434,8 @@
     canvas.addEventListener('blur', () => { if (b.keyboard) hoverTo(-1); });
     canvas.addEventListener('click', (e) => {
       const i = pitAt(e);
-      if (i >= 0) opts.onPit(i);
+      if (i >= 0) opts.onPit(i, touch);
+      else if (opts.onMiss) opts.onMiss();
     });
     canvas.addEventListener('keydown', (e) => {
       const order = [...b.legal].sort((p, q) => rects[p].x - rects[q].x);

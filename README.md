@@ -17,7 +17,7 @@ Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit mu
   Hero powers are shown on the hero cards but are not active yet.
 
 Hovering one of your holes (mouse or keyboard) previews where the last seed of its first sowing lands
-(Settings → Move preview). There is no preview on touch screens yet.
+(Settings → Move preview). On a touch screen, tap a hole once to preview it and tap it again to play.
 
 ## Run it
 

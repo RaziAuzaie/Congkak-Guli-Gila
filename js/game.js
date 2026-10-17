@@ -20,6 +20,7 @@
       language: 'Bahasa', sound: 'Bunyi', music: 'Muzik', on: 'Hidup', off: 'Mati', settings: 'Tetapan',
       previewSetting: 'Pratonton langkah',
       pv_store: 'Buah terakhir masuk rumah anda → main lagi',
+      tapAgain: 'Ketik kampung itu sekali lagi untuk main',
       pv_relay: 'Buah terakhir jatuh di kampung berisi → teruskan menabur',
       pv_capture: 'Buah terakhir jatuh di kampung kosong anda → tembak',
       pv_ownEmpty: 'Buah terakhir jatuh di kampung kosong anda → giliran tamat',
@@ -111,6 +112,7 @@
       language: 'Language', sound: 'Sound', music: 'Music', on: 'On', off: 'Off', settings: 'Settings',
       previewSetting: 'Move preview',
       pv_store: 'Last seed lands in your store → play again',
+      tapAgain: 'Tap the hole again to go',
       pv_relay: 'Last seed lands in a hole with seeds → keep sowing',
       pv_capture: 'Last seed lands in your empty hole → capture',
       pv_ownEmpty: 'Last seed lands in your empty hole → turn ends',
@@ -501,7 +503,7 @@
     updateMusic();
   }
 
-  async function onPit(i) {
+  async function onPit(i, touch = false) {
     if (aiming) {
       if (aiming.targets.includes(i)) await applyItem(aiming.slot, i);
       else board.shake(i);
@@ -513,6 +515,12 @@
       return;
     }
     ac(); // unlock audio on first user gesture
+    // On touch there is no hover: the first tap previews, a second tap on the same hole plays.
+    // Not in 2-player mode, where the preview would show the other player your move.
+    if (touch && settings.preview && mode !== 'pvp' && touchPick !== i) {
+      previewMove(i, true);
+      return;
+    }
     await doMove(i);
   }
 
@@ -662,8 +670,9 @@
   // Hovering one of your playable holes shows where the last seed of its first
   // sowing lands — only that first lap, not the relays after it.
   let previewing = false;
+  let touchPick = -1; // hole previewed by a tap, waiting for a second tap
 
-  function previewMove(i) {
+  function previewMove(i, tapped = false) {
     const ok = settings.preview && i >= 0 && !busy && !aiming && !modalOpen() && state &&
       state.phase === 'play' && isHuman(state.player) && C.legalMoves(state).includes(i);
     if (!ok) { clearPreview(); return; }
@@ -677,11 +686,19 @@
     board.setPreview([[land.pos, land.pos === C.STORE[p] ? 'store' : 'end']]);
     const el = $('#status');
     el.textContent = t(key);
+    if (tapped) {
+      const hint = document.createElement('span');
+      hint.className = 'tap-again';
+      hint.textContent = t('tapAgain');
+      el.appendChild(hint);
+    }
     el.classList.add('preview');
     previewing = true;
+    touchPick = tapped ? i : -1;
   }
 
   function clearPreview() {
+    touchPick = -1;
     board.setPreview(null);
     if (!previewing) return;
     previewing = false;
@@ -1537,7 +1554,7 @@
   window.addEventListener('resize', hideHand);
 
   // ---------- Boot ----------
-  board = window.PixelBoard.create(boardEl, { onPit, onHover: previewMove });
+  board = window.PixelBoard.create(boardEl, { onPit, onHover: previewMove, onMiss: () => { if (touchPick >= 0) clearPreview(); } });
   board.setDir(settings.dir);
 
   // kelip-kelip (fireflies) drifting in the night behind the board

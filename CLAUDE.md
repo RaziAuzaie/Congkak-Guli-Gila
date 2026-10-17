@@ -47,8 +47,11 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
 - **Round end:** a round ends as soon as either side's holes are all empty; leftover seeds go to their owner.
 - **Roguelite matches are one round, and the player always moves first.** In a one-round match the
   first mover wins ~97% between equal players, so difficulty comes from opponent strength and rules.
-- **Move preview** (hover, mouse/keyboard only): shows only where the last seed of the *first* sowing
-  lands and what happens there. Showing the whole relay chain was too easy — do not bring it back.
+- **Move preview**: shows only where the last seed of the *first* sowing lands and what happens there.
+  Showing the whole relay chain was too easy — do not bring it back. Mouse/keyboard: on hover or focus.
+  Touch: the first tap on a hole previews it (with a "tap the hole again to go" hint), a second tap on the
+  same hole plays it. Not in 2-player mode (it would show the other player your move), and with the
+  Move preview setting off a single tap plays.
 - **Map:** clicking a node commits to it. Fights start straight away (toast names the opponent).
   Mysteries pick and save their event on open, and Continue resumes an unanswered one.
 - **Saving:** the run saves whenever the map is shown (and when a mystery opens). Mid-match is not saved.
@@ -72,5 +75,4 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
   - Opponent signature powers (e.g. Toyol steals a seed from a random player hole each time his
     sowing passes the player's rumah; Pawang freezes a hole each turn; Bunian hides counts).
   - Azimat (permanent charms) sold in shops, priced by tier.
-  - Idle animations on hero cards; long-press move preview on phones; tutorial.
-- Known limitation: on touch screens there is no move preview (no hover).
+  - Idle animations on hero cards; tutorial.

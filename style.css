@@ -117,6 +117,9 @@ body {
 
 .status { min-height: 1.4em; color: var(--muted); font-size: 16px; text-align: center; }
 .status.preview { color: #c9ffbe; }
+.tap-again { display: block; color: var(--gold); font-size: 14px; margin-top: 2px; }
+/* Touch screens show a "tap again" line under the preview: keep room for it so the board doesn't jump */
+@media (pointer: coarse) { body:not(.pvp) .status { min-height: calc(2.8em + 20px); } }
 .rotate-hint { display: none; color: var(--muted); font-family: var(--font-label); font-size: 11px; opacity: .7; text-align: center; }
 @media (orientation: portrait) and (max-width: 600px) { .rotate-hint { display: block; } }
 
