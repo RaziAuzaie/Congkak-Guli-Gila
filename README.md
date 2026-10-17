@@ -10,7 +10,8 @@ Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit mu
 - **Classic** — vs the computer (Easy / Medium / Hard) or 2 players on one device. Multi-round, with hangus (burnt) holes.
 - **Roguelite** — pick a hero (Hang Tuah, Mahsuri or Badang), then cross 3 areas (Kampung, Hutan Rimba, Istana).
   Each area is a branching map of matches, elite matches, shops, rest stops and mystery events, ending in a boss.
-  Every match is one round, and you always move first. Combos (relays, captures, extra turns) earn coins;
+  Every match is one round, and you always move first. Seeds are shuffled a little at the start of each
+  match (the same layout on both sides), so openings don't repeat. Combos (relays, captures, extra turns) earn coins;
   coins buy one-use power marbles (guli sakti). Losing costs spirit (semangat); run out and the run ends.
   The run saves automatically whenever the map is shown.
   Hero powers are shown on the hero cards but are not active yet.

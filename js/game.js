@@ -95,6 +95,7 @@
       rogueRulesList: [
         'Pengembaraan merentas <b>3 kawasan</b>. Setiap kawasan ialah peta bercabang yang berakhir dengan seorang <b>ketua</b>.',
         'Setiap perlawanan hanya <b>satu pusingan</b>, dan anda mula dahulu. Rumah yang lebih banyak buah menang.',
+        'Susunan buah <b>diubah sedikit secara rawak</b> pada awal setiap perlawanan, jadi bilangan buah dalam kampung berbeza-beza. Kedua-dua belah sentiasa dapat susunan yang sama, jadi tetap adil.',
         'Kalah → hilang <b>semangat</b> (3 hingga 12, ikut beza buah). Semangat habis → pengembaraan tamat. Ketua mesti dikalahkan untuk mara.',
         '<b>Kombo</b>: setiap sambungan tabur, tembakan atau main lagi dalam satu giliran menambah kombo. Tembakan dan main lagi memberi <b>syiling</b>, begitu juga setiap sambungan ke-5.',
         'Menang memberi syiling tambahan. Lawan elit dan ketua memberi guli percuma.',
@@ -185,6 +186,7 @@
       rogueRulesList: [
         'A run crosses <b>3 areas</b>. Each area is a branching map that ends with a <b>boss</b>.',
         'Every match is a <b>single round</b>, and you always move first. The fuller rumah wins.',
+        'Seeds are <b>shuffled a little</b> at the start of each match, so holes hold different amounts. Both sides always get the same layout, so it stays fair.',
         'Lose and you lose <b>spirit</b> (3 to 12, by the seed difference). Out of spirit → the run is over. A boss must be beaten to move on.',
         '<b>Combos</b>: every relay, capture or extra turn in one turn adds to the combo. Captures and extra turns pay <b>coins</b>, and so does every 5th link.',
         'Winning pays bonus coins. Elite matches and bosses also give a free marble.',
