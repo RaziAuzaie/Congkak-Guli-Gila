@@ -312,10 +312,10 @@ body {
 /* ---------- hero select ---------- */
 .modal.heroes-modal { width: min(100%, 860px); }
 .heroes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 6px var(--px) 4px; }
-/* Each card spans the same 11 rows of the parent grid (subgrid), so portrait, name, style,
+/* Each card spans the same 9 rows of the parent grid (subgrid), so portrait, name, style,
    each label and text, stats and button line up across all cards. */
 .hero-card {
-  --bd: var(--ink); display: grid; grid-row: span 11; grid-template-rows: subgrid; row-gap: 4px;
+  --bd: var(--ink); display: grid; grid-row: span 9; grid-template-rows: subgrid; row-gap: 4px;
   justify-items: center;
   background: var(--panel-hi); padding: 14px 12px;
   box-shadow:
@@ -324,10 +324,10 @@ body {
 }
 .hero-card:hover { --bd: var(--gold-d); }
 .hero-portrait {
-  width: 100%; display: grid; place-items: center; padding: 10px 0 6px;
+  width: 100%; display: grid; place-items: end center; padding: 12px 0 8px;
   background: linear-gradient(180deg, #1b2a20 0 60%, #23382a 60%);
 }
-.hero-art { height: 112px; width: auto; display: block; }
+.hero-art { --hero-px: 6px; width: auto; display: block; }
 .hero-card h3 { margin: 4px 0 0; font-size: 20px; color: var(--gold); text-shadow: 2px 2px 0 var(--ink); }
 .hero-style { margin: 0; font-size: 13.5px; color: var(--muted); text-align: center; }
 .hero-info { display: contents; }

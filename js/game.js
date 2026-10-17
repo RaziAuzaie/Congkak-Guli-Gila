@@ -74,7 +74,7 @@
       shopTitle: 'Kedai Guli', buy: 'Beli', sold: 'Habis', healOffer: 'Ubat (+{n} semangat)', slotOffer: '+1 ruang beg',
       leave: 'Keluar',
       chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
-      lbl_weak: 'Kelemahan', lbl_bag: 'Beg', heroSoon: 'Kuasa wira akan datang. Buat masa ini semua wira bermain sama.',
+      lbl_bag: 'Beg', heroSoon: 'Kuasa wira akan datang. Buat masa ini semua wira bermain sama.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
       use: 'Guna', cancel: 'Batal',
@@ -164,7 +164,7 @@
       shopTitle: 'Marble Shop', buy: 'Buy', sold: 'Sold', healOffer: 'Medicine (+{n} spirit)', slotOffer: '+1 bag slot',
       leave: 'Leave',
       chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
-      lbl_weak: 'Weakness', lbl_bag: 'Bag', heroSoon: 'Hero powers are coming soon. For now every hero plays the same.',
+      lbl_bag: 'Bag', heroSoon: 'Hero powers are coming soon. For now every hero plays the same.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
       use: 'Use', cancel: 'Cancel',
@@ -279,30 +279,33 @@
 
   // ---------- Hero portraits (faceless 8-bit, one palette letter per pixel) ----------
   const HERO_ART = {
+    // Hang Tuah: tanjak headcloth, baju Melayu with songket samping, wavy keris raised high.
     tuah: {
-      pal: { k: '#1a0d05', s: '#c98a5a', S: '#9a6238', t: '#b8322c', g: '#f2c14e', b: '#2b2b3a', B: '#4a4a62',
-        r: '#8e1f1f', w: '#d6dde2', h: '#6b3e1e', p: '#3a2a1a' },
+      pal: { k: '#1a0d05', s: '#c98a5a', S: '#9a6238', t: '#b8322c', g: '#f2c14e', b: '#2b3a6b', B: '#4a5c96',
+        r: '#8e1f1f', w: '#c9d3da', W: '#f4f8fb', h: '#6b3e1e', p: '#2a2018' },
       grid: [
-        '.......kkk........', '......kgttk.......', '.....kttgttk......', '....kttttttgk.....',
-        '....kkkkkkkkk.....', '....ksssssssk.....', '....kssssssSk.....', '....kssssssSk.....',
-        '.....ksssssk......', '......kssk........', '....kkbbbbkk......', '...kbbbBbbbbk.....',
-        '..kbbbbBbbbbbk....', '..kbkbbBbbbkbbkk..', '..kbkbbBbbbkksssk.', '..ksk.bbbbk..kshhk',
-        '..ksk.bbbbk...kwwk', '..kkkrrrrrrk..kwk.', '...krgrrgrrk..kw..', '...krrrrrrrk...k..',
-        '...kppppppppk.....', '...kpppkkpppk.....', '...kppk..kppk.....', '...kssk..kssk.....',
-        '..kkssk..ksskk....', '..kkkkk..kkkkk....',
+        '..k.................', '.kWk................', 'kwWk................', '.kwWk......kk.......',
+        'kwWk......ktgk......', '.kwWk...kkttgtk.....', 'kwWk...ktttttgtk....', 'kgggk..kkkkkkkkkk...',
+        '.ksk...kssssssSSk...', 'ksssk..kssssssSSk...', 'ksssk...kssssSSk....', '.kbbk....kssk.......',
+        '..kbbk.kkbbbbkk.....', '...kbbkbbbbgbbbbk...', '....kbbbbbbBbbbbbk..', '.....kbbbbbbgbbbkbk.',
+        '......kbbbbbBbbbkbk.', '......kbbbbbbbbbkbk.', '......krrgrrgrrrkssk', '......krrrrrrrrrkssk',
+        '......krgrrgrrgrk.k.', '......kpppppppppk...', '......kpppppppppk...', '......kppppkppppk...',
+        '......kpppk.kpppk...', '......ksssk.ksssk...', '.....kkkkkk.kkkkkk..',
       ],
     },
+    // Mahsuri: hair in a sanggul with a gold pin, white kebaya with three kerongsang, batik sarong.
     mahsuri: {
-      pal: { k: '#1a0d05', s: '#d9a273', S: '#a8724a', h: '#1a1a24', y: '#e8c15a', m: '#7a3b6e', M: '#9c5590',
-        n: '#f2c14e' },
+      pal: { k: '#1a0d05', s: '#d9a273', S: '#a8724a', h: '#1a1a24', g: '#f2c14e', w: '#f1ead8', W: '#c9bfa6',
+        m: '#6b2f63', M: '#d9a441' },
       grid: [
-        '......kkkkk.......', '.....khhhhhk......', '....khyyyyyhk.....', '....kyssssyyk.....',
-        '...kyysssssyk.....', '...kyysssssSyk....', '...kyyssssSyyk....', '...kyyysssyyyk....',
-        '...kyyyyyyyyyk....', '...kymmmmmmmyk....', '..kymmMmmmMmmyk...', '..kymmMmmmMmmyk...',
-        '..kmmmMmmmMmmmk...', '..ksmmmmmmmmmsk...', '..ksmmmmmmmmmsk...', '...kmmmmmmmmmk....',
-        '...knnnnnnnnnk....', '...kmmmmmmmmmk....', '...kmmnmmmnmmk....', '...kmmmmmmmmmk....',
-        '...kmmnmmmnmmk....', '...kmmmmmmmmmk....', '..kmmmmmmmmmmmk...', '..ksskkkkkkkssk...',
-        '..kkk.......kkk...',
+        '........kkk.........', '.......khhhk........', '.......khghk........', '......kkhhhkk.......',
+        '.....khhhhhhhk......', '....khhsssssshk.....', '....khssssssShk.....', '....khssssssShk.....',
+        '....khhsssssShk.....', '.....khhssSShhk.....', '......kkssskk.......', '....kkwwkskwwkk.....',
+        '...kwwwwwkgkwwwWk...', '...kwwwwwwkwwwwWk...', '..kwkwwwwkgkwwwkWk..', '..kwkwwwwwkwwwwkWk..',
+        '..kwkwwwwkgkwwwkWk..', '..kskwwwwwkwwwWksk..', '..kskwwwwkmkwwWksk..', '...kkwwwkmmmkwWkk...',
+        '....kwwkmmMmmkWk....', '....kwkmmMmMmmkWk...', '....kkmmMmmmMmmkk...', '....kmmMmmMmmMmmk...',
+        '....kmmmmMmmmmmmk...', '....kmMmmmmMmmMmk...', '.....kmmmmmmmmmk....', '.....kssk...ksskk...',
+        '.....kkkk...kkkk....',
       ],
     },
     badang: {
@@ -333,7 +336,8 @@
         x += n;
       }
     });
-    return `<svg class="${cls || 'hero-art'}" viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
+    const size = cls ? '' : ` style="height: calc(var(--hero-px) * ${grid.length})"`;
+    return `<svg class="${cls || 'hero-art'}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
   }
   const marble = (id) => pxSvg(MARBLE, R.ITEMS[id].color, 'marble');
 
@@ -918,7 +922,6 @@
         <dl class="hero-info">
           <dt>${t('lbl_passive')}</dt><dd>${esc(tx(h.passive))}</dd>
           <dt>${t('lbl_second')}</dt><dd>${h.second ? esc(tx(h.second)) : '—'}</dd>
-          <dt>${t('lbl_weak')}</dt><dd>${esc(tx(h.weakness))}</dd>
         </dl>
         <div class="hero-stats">
           <span title="${t('spirit')}">${icon('heart')}${st.hp}</span>
