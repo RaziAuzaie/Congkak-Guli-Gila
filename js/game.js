@@ -312,16 +312,19 @@
         '.....kkkk...kkkk....',
       ],
     },
+    // Badang: broad, muscled strongman lifting a boulder overhead.
     badang: {
-      pal: { k: '#1a0d05', s: '#b8794a', S: '#8a5430', h: '#1a1a24', g: '#f2c14e', r: '#b23b2e', c: '#3f7d4e',
-        o: '#8a8f99', O: '#5c606a' },
+      pal: { k: '#1a0d05', s: '#b8794a', S: '#8a5430', l: '#d39a68', h: '#1a1a24', g: '#f2c14e', r: '#b23b2e',
+        c: '#3f7d4e', o: '#8a8f99', O: '#5c606a' },
       grid: [
-        '...kkkkkkkkk......', '..koooOoooooOk....', '.kooOooooOoooOk...', '.koooooOoooooOk...',
-        '..kOooooooOOOk....', '...kkkkkkkkkk.....', '..ks.khhhhk.sk....', '..ks.kggggk.sk....',
-        '..ks.ksssSk.sk....', '..ks.ksssSk.sk....', '..kss.kssk.ssk....', '..ksssssssssssk...',
-        '..kssSsssssSssk...', '...ksSsssssSsk....', '...kssssssssk.....', '....ksssSsssk.....',
-        '....kggggggggk....', '....krrcrrcrrk....', '....krrrrrrrrk....', '....krrcrrcrrk....',
-        '....kssk..kssk....', '....kssk..kssk....', '...kkssk..ksskk...', '...kkkkk..kkkkk...',
+        '....kkkkkkkkkkkkkkk.....', '..kkooooOooooooOoookk...', '.kooOooooooOoooooooOok..', '.koooooOooooooOooooook..',
+        '.kOoooooooooOoooooOOok..', '..kOOooOOOooooOOOOOkk...', '...kkkkkkkkkkkkkkkkk....', '..ksssk..kkkkkk..ksssk..',
+        '..ksssk.khhhhhhk.ksssk..', '..kslsk.kggggggk.kslsk..', '..ksssk.ksssssSk.ksssk..', '..ksssSk.ksssSk.kSsssk..',
+        '..kslssSk.kssk.kSsslsk..', '..ksslsssSssssSssslssk..', '..kssssssssssssssssssk..', '..ksssllllssssllllsssk..',
+        '..kssllllllSSllllllssk..', '...ksSSSSSSssSSSSSSsk...', '...ksssssllSSllsssssk...', '....ksssSSssssSSsssk....',
+        '....ksssllSSSSllsssk....', '....kssssSSllSSssssk....', '....kggggggggggggggk....', '....krrrcrrrrrrcrrrk....',
+        '....krrrrrrrrrrrrrrk....', '....krrrcrrrrrrcrrrk....', '....kssssk....kssssk....', '....kssSsk....ksSssk....',
+        '....kssssk....kssssk....', '...kksssskk..kksssskk...', '...kkkkkkkk..kkkkkkkk...',
       ],
     },
   };
