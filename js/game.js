@@ -61,7 +61,6 @@
       chooseNode: 'Pilih destinasi seterusnya',
       node_match: 'Lawan', node_elite: 'Lawan elit', node_boss: 'Ketua', node_shop: 'Kedai',
       node_rest: 'Wakaf', node_event: 'Misteri',
-      fight: 'Lawan!', youFirst: 'Anda mula dahulu.', skill: 'Kemahiran',
       matchWin: 'Menang!', matchLose: 'Kalah…', matchDraw: 'Seri',
       comboCoins: 'Syiling kombo', winBonus: 'Bonus menang', damage: 'Semangat hilang', healed: 'Semangat pulih',
       rewardTitle: 'Ganjaran: pilih satu guli', skip: 'Langkau', take: 'Ambil',
@@ -73,7 +72,7 @@
       runOver: 'Pengembaraan tamat', runOverText: 'Semangat anda habis di {name}.',
       st_wins: 'Perlawanan dimenangi', st_coins: 'Syiling dikumpul', st_combo: 'Kombo terbaik', st_items: 'Guli digunakan',
       shopTitle: 'Kedai Guli', buy: 'Beli', sold: 'Habis', healOffer: 'Ubat (+{n} semangat)', slotOffer: '+1 ruang beg',
-      leave: 'Keluar', backToMap: 'Kembali ke peta',
+      leave: 'Keluar',
       chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
       lbl_weak: 'Kelemahan', lbl_bag: 'Beg', heroSoon: 'Kuasa wira akan datang. Buat masa ini semua wira bermain sama.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
@@ -152,7 +151,6 @@
       chooseNode: 'Choose where to go next',
       node_match: 'Match', node_elite: 'Elite match', node_boss: 'Boss', node_shop: 'Shop',
       node_rest: 'Rest stop', node_event: 'Mystery',
-      fight: 'Fight!', youFirst: 'You move first.', skill: 'Skill',
       matchWin: 'You win!', matchLose: 'Defeated…', matchDraw: 'Draw',
       comboCoins: 'Combo coins', winBonus: 'Win bonus', damage: 'Spirit lost', healed: 'Spirit restored',
       rewardTitle: 'Reward: choose a marble', skip: 'Skip', take: 'Take',
@@ -164,7 +162,7 @@
       runOver: 'Run over', runOverText: 'Your spirit ran out in {name}.',
       st_wins: 'Matches won', st_coins: 'Coins earned', st_combo: 'Best combo', st_items: 'Marbles used',
       shopTitle: 'Marble Shop', buy: 'Buy', sold: 'Sold', healOffer: 'Medicine (+{n} spirit)', slotOffer: '+1 bag slot',
-      leave: 'Leave', backToMap: 'Back to map',
+      leave: 'Leave',
       chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
       lbl_weak: 'Weakness', lbl_bag: 'Bag', heroSoon: 'Hero powers are coming soon. For now every hero plays the same.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
@@ -1052,56 +1050,31 @@
     `, 'wide');
   }
 
-  // Opening a node only looks at it; it counts as visited once you commit
-  // (fight, buy, pick a rest option). Until then Back returns to the map.
-  // A mystery is the exception: opening it commits, so its options can't be scouted.
+  // Clicking a node commits to it. Fights start straight away.
   function enterNode(id) {
     const node = R.nodeById(run, id);
     if (!R.available(run).some((n) => n.id === id)) return;
-    if (node.type === 'shop') showShop(node);
-    else if (node.type === 'rest') showRest(node);
-    else if (node.type === 'event') {
+    if (node.type === 'event') {
       // pick and save the event now, so reloading can't reroll or skip it
       if (!node.event) node.event = R.randomEvent(Math.random);
       node.done = false;
       commitNode(node);
       saveRun();
       showEvent(node);
+      return;
     }
-    else showIntro(node);
+    commitNode(node);
+    if (node.type === 'shop') showShop(node);
+    else if (node.type === 'rest') showRest(node);
+    else startMatch(node);
   }
 
   function commitNode(node) {
     if (run.at !== node.id) R.visit(run, node);
   }
-  const committed = (node) => run.at === node.id;
-  const backButton = () => `<div class="actions"><button type="button" class="btn ghost" data-act="map">${t('backToMap')}</button></div>`;
 
-  function showIntro(node) {
+  function startMatch(node) {
     const m = R.makeMatch(run, node);
-    const e = R.ENEMIES[m.enemy];
-    const lvl = Math.min(5, m.ai.depth);
-    const stars = `<span aria-label="${lvl}/5">${'★'.repeat(lvl)}<span class="off">${'★'.repeat(5 - lvl)}</span></span>`;
-    const mods = m.mods.map((k) => `<li>${esc(tx(R.MODS[k]))}</li>`).join('');
-    pendingMatch = { m, node };
-    openModal(`
-      <div class="intro t-${node.type}">${icon(node.type)}<span>${t('node_' + node.type)}</span></div>
-      <h2>${esc(e.name)}</h2>
-      <p class="tagline">${esc(tx(e.title))}</p>
-      <p class="note">${t('skill')}: <span class="stars">${stars}</span></p>
-      ${mods ? `<ul class="mods">${mods}</ul>` : ''}
-      <p class="note">${t('youFirst')}</p>
-      <div class="actions">
-        ${committed(node) ? '' : `<button type="button" class="btn ghost" data-act="map">${t('backToMap')}</button>`}
-        <button type="button" class="btn primary" data-act="fight">${t('fight')}</button>
-      </div>
-    `);
-  }
-  let pendingMatch = null;
-
-  function startMatch() {
-    const { m, node } = pendingMatch;
-    commitNode(node);
     gen++;
     mode = 'rogue';
     match = { m, node, combo: 0, coins: 0, gold: false };
@@ -1120,6 +1093,7 @@
     updateUI();
     setStatus(turnStatus());
     updateMusic();
+    toast(`${t('node_' + node.type)}: ${enemyName()}`);
     if (!isHuman(state.player)) aiTurn();
   }
 
@@ -1245,7 +1219,7 @@
       </div>
       ${full ? `<p class="note warn">${t('bagFull')}</p>` : ''}
       ${bagHtml(true)}
-      <div class="actions"><button type="button" class="btn ghost" data-act="map">${committed(node) ? t('leave') : t('backToMap')}</button></div>
+      <div class="actions"><button type="button" class="btn ghost" data-act="map">${t('leave')}</button></div>
     `);
     shopNode = node;
     screen = 'shop';
@@ -1259,7 +1233,6 @@
       <div class="choices">
         ${R.REST.map((o, k) => `<button type="button" class="btn ghost" data-rest="${k}" ${o.can(run) ? '' : 'disabled'}>${esc(tx(o.label(run)))}</button>`).join('')}
       </div>
-      ${backButton()}
     `);
     restNode = node;
   }
@@ -1488,9 +1461,8 @@
       case 'newRunYes': startRun(); break;
       case 'continueRun': continueRun(); break;
       case 'map': showMap(); break;
-      case 'fight': startMatch(); break;
       case 'giveUpYes': giveUp(); break;
-      case 'retry': showIntro(afterMatch.node); break;
+      case 'retry': startMatch(afterMatch.node); break;
       case 'reward': showReward(afterMatch.out.reward); break;
       case 'afterReward': afterReward(); break;
       case 'nextArea': R.nextArea(run); showMap(); break;
