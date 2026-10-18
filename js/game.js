@@ -75,7 +75,9 @@
       shopTitle: 'Kedai Guli', buy: 'Beli', sold: 'Habis', healOffer: 'Ubat (+{n} semangat)', slotOffer: '+1 ruang beg',
       leave: 'Keluar',
       chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
-      lbl_bag: 'Beg', heroSoon: 'Kuasa wira akan datang. Buat masa ini semua wira bermain sama.',
+      lbl_bag: 'Beg', heroSoon: 'Kuasa pasif sudah aktif. Statistik wira dan kuasa kedua akan datang.',
+      kerisSteal: 'Keris Taming Sari! Curi 1 buah', badangBonus: 'Kekuatan Badang! +1',
+      revived: 'Darah Putih! Mahsuri bangkit semula', revivedNote: 'Darah Putih menyelamatkan anda. Ia hanya sekali setiap pengembaraan.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
       use: 'Guna', cancel: 'Batal',
@@ -167,7 +169,9 @@
       shopTitle: 'Marble Shop', buy: 'Buy', sold: 'Sold', healOffer: 'Medicine (+{n} spirit)', slotOffer: '+1 bag slot',
       leave: 'Leave',
       chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
-      lbl_bag: 'Bag', heroSoon: 'Hero powers are coming soon. For now every hero plays the same.',
+      lbl_bag: 'Bag', heroSoon: 'Passive powers are active. Hero stats and second powers are coming soon.',
+      kerisSteal: 'Keris Taming Sari! Stole 1 seed', badangBonus: 'Kekuatan Badang! +1',
+      revived: 'Darah Putih! Mahsuri rises again', revivedNote: 'Darah Putih saved you. It works only once per run.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
       use: 'Use', cancel: 'Cancel',
@@ -287,35 +291,40 @@
     tuah: {
       pal: { k: '#1a0d05', s: '#c98a5a', S: '#9a6238', t: '#b8322c', g: '#f2c14e', b: '#2b3a6b', B: '#4a5c96',
         r: '#8e1f1f', w: '#c9d3da', W: '#f4f8fb', h: '#6b3e1e', p: '#2a2018' },
+      idle: { up: 19, beat: 1.6, glint: 2.4, sparkle: [[2, 6], [3, 5], [2, 4], [3, 3], [2, 2], [2, 1]] }, // keris glint
       grid: [
-        '..k.................', '.kWk................', 'kwWk................', '.kwWk......kk.......',
-        'kwWk......ktgk......', '.kwWk...kkttgtk.....', 'kwWk...ktttttgtk....', 'kgggk..kkkkkkkkkk...',
-        '.ksk...kssssssSSk...', 'ksssk..kssssssSSk...', 'ksssk...kssssSSk....', '.kbbk....kssk.......',
-        '..kbbk.kkbbbbkk.....', '...kbbkbbbbgbbbbk...', '....kbbbbbbBbbbbbk..', '.....kbbbbbbgbbbkbk.',
-        '......kbbbbbBbbbkbk.', '......kbbbbbbbbbkbk.', '......krrgrrgrrrkssk', '......krrrrrrrrrkssk',
-        '......krgrrgrrgrk.k.', '......kpppppppppk...', '......kpppppppppk...', '......kppppkppppk...',
-        '......kpppk.kpppk...', '......ksssk.ksssk...', '.....kkkkkk.kkkkkk..',
+        '..k...............', '.kWk..............', 'kwWk..............', '.kwWk.....kk......',
+        'kwWk.....ktgk.....', '.kwWk...kttgtk....', 'kwWk...kttttgtk...', 'kgggk..kkkkkkkk...',
+        '.ksk...ksssssSk...', 'ksssk..ksssssSk...', 'ksssk..ksssssSk...', '.kbbk...ksssSk....',
+        '.kbbk....kssk.....', '..kbbk.kkbbbbkkk..', '...kbbkbbbgbbbkbk.', '......kbbbgbbbkbk.',
+        '......kbbbBbbbkbk.', '......kbbbgbbbkbk.', '......kbbbBbbbkbk.', '......krrgrrgrkssk',
+        '......krrrrrrrkssk', '......krgrrrgrk.k.', '......kpppppppk...', '......kpppppppk...',
+        '......kpppkpppk...', '......kppk.kppk...', '......kppk.kppk...', '......kppk.kppk...',
+        '......kssk.kssk...', '.....kkssk.ksskk..', '.....kkkkk.kkkkk..',
       ],
     },
     // Mahsuri: hair in a sanggul with a gold pin, white kebaya with three kerongsang, batik sarong.
     mahsuri: {
       pal: { k: '#1a0d05', s: '#d9a273', S: '#a8724a', h: '#1a1a24', g: '#f2c14e', w: '#f1ead8', W: '#c9bfa6',
         m: '#6b2f63', M: '#d9a441' },
+      // hair pin, then the middle kerongsang half a cycle later: two separate twinkles
+      idle: { up: 18, beat: 2.2, glint: 3.2, sparkle: [[7, 2, 0], [7, 14, 1.6]] },
       grid: [
-        '........kkk.........', '.......khhhk........', '.......khghk........', '......kkhhhkk.......',
-        '.....khhhhhhhk......', '....khhsssssshk.....', '....khssssssShk.....', '....khssssssShk.....',
-        '....khhsssssShk.....', '.....khhssSShhk.....', '......kkssskk.......', '....kkwwkskwwkk.....',
-        '...kwwwwwkgkwwwWk...', '...kwwwwwwkwwwwWk...', '..kwkwwwwkgkwwwkWk..', '..kwkwwwwwkwwwwkWk..',
-        '..kwkwwwwkgkwwwkWk..', '..kskwwwwwkwwwWksk..', '..kskwwwwkmkwwWksk..', '...kkwwwkmmmkwWkk...',
-        '....kwwkmmMmmkWk....', '....kwkmmMmMmmkWk...', '....kkmmMmmmMmmkk...', '....kmmMmmMmmMmmk...',
-        '....kmmmmMmmmmmmk...', '....kmMmmmmMmmMmk...', '.....kmmmmmmmmmk....', '.....kssk...ksskk...',
-        '.....kkkk...kkkk....',
+        '......kkk......', '.....khhhk.....', '.....khghk.....', '....kkhhhkk....',
+        '...khhhhhhhk...', '...khssssShk...', '...khssssShk...', '...khssssShk...',
+        '...khhsssShk...', '....khssShk....', '.....ksssk.....', '....kwwswwk....',
+        '...kwwwgwwWk...', '..kwwwwwwwwWk..', '..kwkwwgwwkWk..', '..kwkwwwwwkWk..',
+        '..kwkwwgwwkWk..', '..kskwwwwwksk..', '...kwwwmwwWk...', '...kwwmmmwWk...',
+        '...kwmmMmmWk...', '...kkmMmmMkk...', '....kmmMmmk....', '....kMmmmMk....',
+        '....kmmMmmk....', '....kmMmmMk....', '....kmmmmmk....', '....ksk.ksk....',
+        '....kkk.kkk....',
       ],
     },
     // Badang: broad, muscled strongman lifting a boulder overhead.
     badang: {
       pal: { k: '#1a0d05', s: '#b8794a', S: '#8a5430', l: '#d39a68', h: '#1a1a24', g: '#f2c14e', r: '#b23b2e',
         c: '#3f7d4e', o: '#8a8f99', O: '#5c606a' },
+      idle: { up: 22, beat: 1.2 }, // heavy breaths under the boulder
       grid: [
         '....kkkkkkkkkkkkkkk.....', '..kkooooOooooooOoookk...', '.kooOooooooOoooooooOok..', '.koooooOooooooOooooook..',
         '.kOoooooooooOoooooOOok..', '..kOOooOOOooooOOOOOkk...', '...kkkkkkkkkkkkkkkkk....', '..ksssk..kkkkkk..ksssk..',
@@ -330,21 +339,36 @@
   };
 
   /** Multi-colour pixel art: each run of same-colour pixels becomes one rect. */
+  /**
+   * Multi-colour pixel art: each run of same-colour pixels becomes one rect.
+   * The big portrait (no cls) also gets its idle loop: the rows above idle.up sit in a group
+   * that drops 1px every other beat (a breath), drawn last so it overlaps the rows below,
+   * and the sparkle pixels flash white.
+   */
   function heroSvg(id, cls) {
-    const { pal, grid } = HERO_ART[id];
+    const { pal, grid, idle } = HERO_ART[id];
     const w = Math.max(...grid.map((r) => r.length));
-    let rects = '';
+    const anim = !cls && idle;
+    let low = '', up = '';
     grid.forEach((row, y) => {
       for (let x = 0; x < row.length;) {
         const ch = row[x];
         let n = 1;
         while (row[x + n] === ch) n++;
-        if (pal[ch]) rects += `<rect x="${x}" y="${y}" width="${n}" height="1" fill="${pal[ch]}"/>`;
+        const r = pal[ch] ? `<rect x="${x}" y="${y}" width="${n}" height="1" fill="${pal[ch]}"/>` : '';
+        if (anim && y < idle.up) up += r; else low += r;
         x += n;
       }
     });
+    let body = low;
+    if (anim) {
+      // A sparkle's third number is its own delay; without one, sparkles run in order 0.12s apart
+      const sp = (idle.sparkle || []).map(([x, y, d], k) =>
+        `<rect class="hero-spark" x="${x}" y="${y}" width="1" height="1" fill="#fff" style="animation-delay: ${(d ?? k * 0.12).toFixed(2)}s"/>`).join('');
+      body += `<g class="hero-up" style="--beat: ${idle.beat}s; --glint: ${idle.glint || 0}s">${up}${sp}</g>`;
+    }
     const size = cls ? '' : ` style="height: calc(var(--hero-px) * ${grid.length})"`;
-    return `<svg class="${cls || 'hero-art'}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
+    return `<svg class="${cls || 'hero-art'}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${body}</svg>`;
   }
   const marble = (id) => pxSvg(MARBLE, R.ITEMS[id].color, 'marble');
 
@@ -616,6 +640,26 @@
           flash(ev.store);
           await sleep(STEP * 3);
           break;
+        // hero passives
+        case 'steal':
+          flash(ev.from);
+          view[ev.from]--;
+          view[ev.to]++;
+          renderPit(ev.from);
+          renderPit(ev.to);
+          flash(ev.to);
+          toast(t('kerisSteal'));
+          sfx('magic');
+          await sleep(STEP * 4);
+          break;
+        case 'bonus':
+          view[ev.pos]++;
+          renderPit(ev.pos);
+          flash(ev.pos);
+          toast(t('badangBonus'));
+          sfx('coin');
+          await sleep(STEP * 2);
+          break;
         // power-marble effects
         case 'move':
           flash(ev.from);
@@ -754,7 +798,9 @@
       const id = run.items[k];
       if (!id) { html += `<div class="slot empty" aria-label="${t('emptySlot')}"></div>`; continue; }
       const cls = (k === selSlot ? ' sel' : '') + (aiming && aiming.slot === k ? ' aim' : '');
-      html += `<button type="button" class="slot${cls}" data-slot="${k}" aria-label="${esc(tx(R.ITEMS[id].name))}">${marble(id)}</button>`;
+      const it = R.ITEMS[id];
+      html += `<button type="button" class="slot card${cls}" data-slot="${k}" aria-label="${esc(tx(it.name))}">${marble(id)}` +
+        `<span class="slot-name">${esc(tx(it.name))}</span><span class="slot-desc">${esc(tx(it.short))}</span></button>`;
     }
     if (state.phase === 'play') {
       html += `<button type="button" class="slot giveup" data-tray="giveup" aria-label="${t('giveUp')}" title="${t('giveUp')}">${icon('flag')}</button>`;
@@ -1139,6 +1185,7 @@
     if (out.coins) rows.push([t('winBonus'), `+${out.coins}`]);
     if (out.damage) rows.push([t('damage'), `−${out.damage}`, 'bad']);
     if (out.heal) rows.push([t('healed'), `+${out.heal}`]);
+    if (out.revived) rows.push([t('revived'), `${run.hp}`]);
 
     let next;
     if (out.dead) next = 'runOver';
@@ -1156,6 +1203,7 @@
       </div>
       <div class="ledger">${rows.map(([k, v, c]) => `<div class="${c || ''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>
       <div class="hud center">${hudHtml()}</div>
+      ${out.revived ? `<p class="note">${t('revivedNote')}</p>` : ''}
       ${out.retry ? `<p class="note warn">${t('bossRetry')}</p>` : ''}
       <div class="actions">
         <button type="button" class="btn primary" data-act="${next}">${out.retry ? t('retryBoss') : t('continue')}</button>

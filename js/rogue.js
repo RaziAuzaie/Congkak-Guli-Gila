@@ -23,72 +23,88 @@
 
   // ---------- power marbles ----------
   // target: 'own' = one of your holes, 'opp' = one of the opponent's, null = none
+  // short = one line shown under the marble in the match tray; desc = the full text
   const ITEMS = {
     emas: {
       color: '#f2c14e', rarity: 1, price: 8, target: null,
       name: L('Guli Emas', 'Gold Marble'),
+      short: L('Syiling x2 giliran ini', 'Coins x2 this turn'),
       desc: L('Syiling yang anda dapat giliran ini digandakan.', 'Double the coins you earn this turn.'),
     },
     ramal: {
       color: '#ff7eb6', rarity: 1, price: 6, target: null,
       name: L('Guli Ramal', 'Seer Marble'),
+      short: L('Tunjuk langkah terbaik', 'Shows the best move'),
       desc: L('Tunjukkan langkah terbaik untuk giliran ini.', 'Shows the best move for this turn.'),
     },
     ais: {
       color: '#8fe3ff', rarity: 1, price: 9, target: 'opp',
       name: L('Guli Ais', 'Ice Marble'),
+      short: L('Bekukan 1 kampung lawan', 'Freeze 1 enemy hole'),
       desc: L('Bekukan satu kampung lawan. Lawan tak boleh memilihnya pada giliran seterusnya.',
         'Freeze one of the opponent’s holes. They can’t pick it on their next turn.'),
     },
     perisai: {
       color: '#6fb7ff', rarity: 1, price: 9, target: null,
       name: L('Guli Perisai', 'Shield Marble'),
+      short: L('Lawan tak boleh tembak', 'Blocks enemy captures'),
       desc: L('Lawan tak boleh menembak kampung anda pada giliran seterusnya.',
         'The opponent can’t capture from your holes on their next turn.'),
     },
     tanah: {
       color: '#c08a4a', rarity: 1, price: 10, target: 'own',
       name: L('Guli Tanah', 'Earth Marble'),
+      short: L('+4 buah ke 1 kampung', '+4 seeds in 1 hole'),
       desc: L('Tambah 4 buah baharu ke dalam satu kampung anda.', 'Add 4 new seeds to one of your holes.'),
     },
     tuai: {
       color: '#9bd35a', rarity: 2, price: 13, target: 'own',
       name: L('Guli Tuai', 'Harvest Marble'),
+      short: L('1 kampung terus ke rumah', '1 hole straight to rumah'),
       desc: L('Pindahkan semua buah dari satu kampung anda terus ke rumah anda.',
         'Move every seed in one of your holes straight into your rumah.'),
     },
     petir: {
       color: '#ffe14d', rarity: 2, price: 13, target: null,
       name: L('Guli Petir', 'Lightning Marble'),
+      short: L('Tembakan ambil 3 kampung', 'Capture takes 3 holes'),
       desc: L('Tembakan anda yang seterusnya giliran ini turut mengambil dua kampung di sebelah kampung bertentangan.',
         'Your next capture this turn also takes the two holes beside the opposite hole.'),
     },
     bayang: {
       color: '#9a9fd0', rarity: 2, price: 14, target: null,
       name: L('Guli Bayang', 'Shadow Marble'),
+      short: L('Langkau kampung lawan', 'Sowing skips enemy holes'),
       desc: L('Taburan anda yang seterusnya melangkau semua kampung lawan.',
         'Your next sowing skips all of the opponent’s holes.'),
     },
     masa: {
       color: '#ff9f43', rarity: 3, price: 18, target: null,
       name: L('Guli Masa', 'Time Marble'),
+      short: L('Main sekali lagi', 'Play once more'),
       desc: L('Bila giliran anda tamat, anda main sekali lagi.', 'When your turn ends, you play once more.'),
     },
     curi: {
       color: '#c46bd6', rarity: 3, price: 20, target: 'opp',
       name: L('Guli Curi', 'Thief Marble'),
+      short: L('Curi 1 kampung lawan', 'Steal 1 enemy hole'),
       desc: L('Curi semua buah dari satu kampung lawan ke rumah anda.',
         'Steal every seed in one of the opponent’s holes into your rumah.'),
     },
     ribut: {
       color: '#7fd6c2', rarity: 3, price: 22, target: null,
       name: L('Guli Ribut', 'Storm Marble'),
+      short: L('−1 buah tiap kampung lawan', '−1 seed per enemy hole'),
       desc: L('Setiap kampung lawan yang berisi kehilangan 1 buah ke rumah anda.',
         'Every opponent hole with seeds loses 1 seed into your rumah.'),
     },
   };
 
-  // ---------- heroes (chosen at the start of a run; powers not active yet) ----------
+  // ---------- heroes (chosen at the start of a run) ----------
+  // Passives are active: Tuah and Badang in the engine (opts.powers), Mahsuri's revive in finishMatch.
+  // Stats and Mahsuri's second power are display-only for now.
+  const REVIVE_HP = 15; // Darah Putih
+
   const HEROES = {
     tuah: {
       name: 'Hang Tuah',
@@ -110,8 +126,8 @@
     badang: {
       name: 'Badang',
       style: L('Kekuatan mentah', 'Raw power'),
-      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dan bukan 1.',
-        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds there instead of 1.'),
+      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dan bukan 1 (maks 3 setiap giliran).',
+        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds there instead of 1 (max 3 per turn).'),
       second: null,
       stats: { hp: 50, coins: 10, slots: 2, items: 1 },
     },
@@ -315,6 +331,7 @@
     const mods = e.mods || [];
     const opts = {
       seeds: randomLayout(rnd), store: [0, 0], burnt: new Array(C.SIZE).fill(false), bold: [0, 0], single: true,
+      powers: [run.hero === 'tuah' || run.hero === 'badang' ? run.hero : null, null],
     };
     if (mods.includes('licik')) for (const i of C.sidePits(1)) opts.seeds[i]++;
     if (mods.includes('kaya')) opts.store[1] = 10;
@@ -350,7 +367,7 @@
     const boss = node.type === 'boss';
     const out = {
       me, them, win: diff > 0, draw: diff === 0, forfeit, coins: 0, damage: 0, heal: 0,
-      reward: null, retry: false, dead: false, areaClear: false, victory: false,
+      reward: null, retry: false, dead: false, revived: false, areaClear: false, victory: false,
     };
     run.stats.matches++;
     if (out.win) {
@@ -367,6 +384,12 @@
       if (!out.draw) {
         out.damage = damageFor(-diff);
         run.hp = Math.max(0, run.hp - out.damage);
+      }
+      // Darah Putih: the first time Mahsuri's spirit hits 0 she survives with 15 (once per run)
+      if (run.hp <= 0 && run.hero === 'mahsuri' && !run.revived) {
+        run.revived = true;
+        run.hp = Math.min(run.maxHp, REVIVE_HP);
+        out.revived = true;
       }
       if (run.hp <= 0) { out.dead = true; run.done = true; }
       else if (boss) out.retry = true; // a boss must be beaten to move on
@@ -546,7 +569,7 @@
   function randomEvent(rnd) { return pick(Object.keys(EVENTS), rnd); }
 
   const api = {
-    START, MAX_SLOTS, ROWS, COLS, ITEMS, HEROES, MODS, ENEMIES, AREAS, REST, EVENTS,
+    START, MAX_SLOTS, REVIVE_HP, ROWS, COLS, ITEMS, HEROES, MODS, ENEMIES, AREAS, REST, EVENTS,
     newRun, nextArea, genMap, available, visit, nodeById,
     makeMatch, finishMatch, hitValue, damageFor, itemTargets, useItem,
     makeShop, buy, randomEvent, randomItem, addItem, hasSlot, heal, earn,

@@ -227,7 +227,7 @@ body {
 
 .tray { width: min(100%, 980px); display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .tray:empty { display: none; }
-.slots { display: flex; gap: 14px; justify-content: center; }
+.slots { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: stretch; }
 .slot {
   width: 48px; height: 48px; display: grid; place-items: center; padding: 0;
   background: var(--panel); border: 0; cursor: pointer;
@@ -236,7 +236,12 @@ body {
 .slot.sel { --bd: var(--gold); background: var(--panel-hi); }
 .slot.aim { --bd: #ff7eb6; }
 .slot.empty { background: rgba(26, 13, 5, .5); cursor: default; }
-.slot.giveup { margin-left: 18px; background: #3a170e; color: #ffcbb8; }
+/* Filled slots are small cards: marble, name and a one-line effect underneath */
+.slot.card, .slot.empty { width: 104px; height: auto; min-height: 48px; }
+.slot.card { font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 6px; color: var(--text); }
+.slot-name { font-size: 12px; font-weight: 700; color: var(--gold); line-height: 1.15; text-align: center; }
+.slot-desc { font-size: 12px; line-height: 1.2; text-align: center; }
+.slot.giveup { margin-left: 18px; align-self: center; background: #3a170e; color: #ffcbb8; }
 .slot.giveup:hover { background: #5a2416; }
 .slot.giveup .pxi { width: 20px; height: 20px; }
 .slot:focus-visible, .node:focus-visible { outline: 2px dashed var(--gold); outline-offset: 6px; }
@@ -331,6 +336,12 @@ body {
   background: linear-gradient(180deg, #1b2a20 0 60%, #23382a 60%);
 }
 .hero-art { --hero-px: 6px; width: auto; display: block; }
+/* Idle loop: the upper body drops 1px every other beat; sparkle pixels flash in turn */
+.hero-art .hero-up { animation: hero-breathe var(--beat) steps(1, end) infinite; }
+.hero-art .hero-spark { opacity: 0; animation: hero-spark var(--glint) steps(1, end) infinite; }
+@keyframes hero-breathe { 0% { transform: translateY(0); } 50% { transform: translateY(1px); } }
+@keyframes hero-spark { 0% { opacity: 1; } 5% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-art .hero-up, .hero-art .hero-spark { animation: none; } }
 .hero-card h3 { margin: 4px 0 0; font-size: 20px; color: var(--gold); text-shadow: 2px 2px 0 var(--ink); }
 .hero-style { margin: 0; font-size: 13.5px; color: var(--muted); text-align: center; }
 .hero-info { display: contents; }

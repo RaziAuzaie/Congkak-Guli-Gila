@@ -1,4 +1,5 @@
-// Roguelite simulation: node test/rogue.js [runs] [playerDepth] [playerRandom]
+// Roguelite simulation: node test/rogue.js [runs] [playerDepth] [playerRandom] [hero]
+// hero = none (default, no passive) | tuah | mahsuri | badang | all (one block per hero)
 // Plays whole runs with an AI standing in for the player. Checks that maps are
 // well formed and runs always finish, and prints balance numbers.
 const C = require('../js/engine.js');
@@ -7,6 +8,9 @@ const R = require('../js/rogue.js');
 
 const RUNS = Number(process.argv[2] || 60);
 const PLAYER = { depth: Number(process.argv[3] || 3), random: Number(process.argv[4] || 0.15) };
+const HERO_ARG = process.argv[5] || 'none';
+const HEROES = HERO_ARG === 'all' ? ['none', ...Object.keys(R.HEROES)] : [HERO_ARG];
+if (HEROES.some((h) => h !== 'none' && !R.HEROES[h])) { console.error('unknown hero ' + HERO_ARG); process.exit(1); }
 let errors = 0;
 const fail = (msg) => { errors++; if (errors < 10) console.error(msg); };
 
@@ -24,8 +28,7 @@ function checkMap(run) {
   }
 }
 
-const perArea = [0, 1, 2].map(() => ({ matches: 0, wins: 0, coinsCombo: 0, bossTries: 0, bossWins: 0 }));
-let deaths = [0, 0, 0], victories = 0, totalNodes = 0;
+let perArea, deaths, victories, totalNodes, revives;
 
 function playMatch(run, node, rnd) {
   const m = R.makeMatch(run, node, rnd);
@@ -66,12 +69,16 @@ function playMatch(run, node, rnd) {
   if (out.win) a.wins++;
   if (node.type === 'boss') { a.bossTries++; if (out.win) a.bossWins++; }
   if (out.reward && R.hasSlot(run)) R.addItem(run, out.reward[0]);
+  if (out.revived) revives++;
   return out;
 }
 
+function simulate(hero) {
+perArea = [0, 1, 2].map(() => ({ matches: 0, wins: 0, coinsCombo: 0, bossTries: 0, bossWins: 0 }));
+deaths = [0, 0, 0]; victories = 0; totalNodes = 0; revives = 0;
 for (let k = 0; k < RUNS; k++) {
   const rnd = Math.random;
-  const run = R.newRun(rnd);
+  const run = R.newRun(rnd, hero === 'none' ? null : hero);
   checkMap(run);
   let steps = 0;
   while (!run.done) {
@@ -103,12 +110,16 @@ for (let k = 0; k < RUNS; k++) {
   if (run.won) victories++; else deaths[run.area]++;
 }
 
-console.log(`player AI depth ${PLAYER.depth}, random ${PLAYER.random}, ${RUNS} runs`);
+console.log(`hero ${hero}: player AI depth ${PLAYER.depth}, random ${PLAYER.random}, ${RUNS} runs`);
 perArea.forEach((a, i) => {
   if (!a.matches) return;
   console.log(`area ${i + 1}: win ${(100 * a.wins / a.matches).toFixed(0)}% of ${a.matches} matches, ` +
     `combo coins/match ${(a.coinsCombo / a.matches).toFixed(1)}, boss ${a.bossWins}/${a.bossTries}`);
 });
-console.log(`deaths by area ${deaths.join(' / ')}, victories ${victories}/${RUNS}, nodes/run ${(totalNodes / RUNS).toFixed(1)}`);
+console.log(`deaths by area ${deaths.join(' / ')}, victories ${victories}/${RUNS}, nodes/run ${(totalNodes / RUNS).toFixed(1)}` +
+  (revives ? `, revives ${revives}` : ''));
+}
+
+HEROES.forEach(simulate);
 console.log(errors ? `FAILED with ${errors} errors` : 'ALL OK');
 process.exit(errors ? 1 : 0);

@@ -26,6 +26,8 @@
   const STORE = [7, 15];   // rumah index for player 0 / 1
   const SIZE = 16;
   const MAX_STEPS = 5000;  // guard against pathological relay loops
+  const KERIS_MAX = 3;     // Hang Tuah: steals per turn
+  const BADANG_MAX = 3;    // Badang: bonus seeds per turn (uncapped he won ~99% of sim runs)
 
   function sidePits(p) {
     const base = p === 0 ? 0 : 8;
@@ -41,6 +43,9 @@
     return {
       shadow: [0, 0], lightning: [0, 0], shield: [0, 0], time: [0, 0],
       bold: [0, 0], frozen: new Array(SIZE).fill(0),
+      // roguelite hero passives: powers[p] = 'tuah' | 'badang' | null;
+      // combo[p] = combo hits this turn, steals[p] = keris steals / Badang bonus seeds this turn
+      powers: [null, null], combo: [0, 0], steals: [0, 0],
     };
   }
 
@@ -51,6 +56,7 @@
    *   burnt  array of SIZE booleans; burnt holes start empty
    *   bold   [p0, p1] extra turn after a capture
    *   single true = the game is one round; the round's end is the game's end
+   *   powers [p0, p1] hero passives: 'tuah' (keris steals) | 'badang' (bonus seed in own rumah) | null
    */
   function createGame(first = 0, opts = {}) {
     const holes = new Array(SIZE).fill(START_SEEDS);
@@ -61,6 +67,7 @@
     burnt.forEach((b, i) => { if (b) holes[i] = 0; });
     const fx = newFx();
     if (opts.bold) fx.bold = opts.bold.map((b) => (b ? 1 : 0));
+    if (opts.powers) fx.powers = opts.powers.slice();
     return {
       holes,
       burnt,
@@ -86,6 +93,7 @@
       fx: {
         shadow: f.shadow.slice(), lightning: f.lightning.slice(), shield: f.shield.slice(),
         time: f.time.slice(), bold: f.bold.slice(), frozen: f.frozen.slice(),
+        powers: f.powers, combo: f.combo.slice(), steals: f.steals.slice(),
       },
     };
   }
@@ -131,6 +139,18 @@
     let steps = 0;
     let result;
 
+    // A combo hit (relay, capture or extra turn). Keris Taming Sari: every 2nd hit in
+    // Hang Tuah's turn steals 1 seed from the opponent's rumah, at most 3 per turn.
+    const hit = () => {
+      fx.combo[p]++;
+      if (fx.powers[p] === 'tuah' && fx.combo[p] % 2 === 0 && fx.steals[p] < KERIS_MAX && st.holes[STORE[1 - p]] > 0) {
+        st.holes[STORE[1 - p]]--;
+        st.holes[STORE[p]]++;
+        fx.steals[p]++;
+        if (ev) ev.push({ t: 'steal', from: STORE[1 - p], to: STORE[p] });
+      }
+    };
+
     for (;;) {
       while (seeds > 0) {
         pos = nextPos(pos, p, st.burnt, shadow);
@@ -138,12 +158,19 @@
         seeds--;
         steps++;
         if (ev) ev.push({ t: 'drop', pos, hand: seeds });
+        // Kekuatan Badang: a bonus seed when his sowing passes his own rumah (capped per turn)
+        if (pos === STORE[p] && fx.powers[p] === 'badang' && fx.steals[p] < BADANG_MAX) {
+          st.holes[pos]++;
+          fx.steals[p]++;
+          if (ev) ev.push({ t: 'bonus', pos });
+        }
       }
 
       // Last seed in own rumah: play again
       if (pos === STORE[p]) {
         result = 'extra';
         if (ev) ev.push({ t: 'extra' });
+        hit();
         break;
       }
 
@@ -152,6 +179,7 @@
         seeds = st.holes[pos];
         st.holes[pos] = 0;
         if (ev) ev.push({ t: 'pick', pos, n: seeds });
+        hit();
         continue;
       }
 
@@ -179,9 +207,11 @@
           }
           st.holes[STORE[p]] += n;
           if (ev) ev.push({ t: 'capture', pos, opp: o, extra, n, store: STORE[p] });
+          hit();
           if (fx.bold[p]) {
             result = 'extra';
             if (ev) ev.push({ t: 'extra', why: 'bold' });
+            hit();
           }
         }
       }
@@ -192,12 +222,15 @@
       fx.time[p] = 0;
       result = 'extra';
       if (ev) ev.push({ t: 'extra', why: 'time' });
+      hit();
     }
 
     if (result === 'end') {
       // p's turn is over: effects that last "until the end of the turn" expire
       fx.lightning[p] = 0;
       fx.shield[1 - p] = 0;
+      fx.combo[p] = 0;
+      fx.steals[p] = 0;
       for (const i of sidePits(p)) if (fx.frozen[i]) fx.frozen[i]--;
       st.player = 1 - p;
     }

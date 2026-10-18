@@ -54,9 +54,9 @@ Full tasks with acceptance criteria are in `tasks/todo.md`.
 ### Checkpoint A: tests pass, run numbers unchanged for Hang Tuah (default stats)
 
 ### Phase 2: Hero powers
-- [ ] Task 3: Badang — Kekuatan Badang
-- [ ] Task 4: Hang Tuah — Keris Taming Sari
-- [ ] Task 5: Mahsuri — Darah Putih and Sumpahan Mahsuri
+- [x] Task 3: Badang — Kekuatan Badang (capped at 3 per turn)
+- [x] Task 4: Hang Tuah — Keris Taming Sari
+- [ ] Task 5: Mahsuri — Darah Putih (done) and Sumpahan Mahsuri (not yet)
 - [ ] Task 6: Hero balance pass, remove "powers coming soon" note
 
 ### Checkpoint B: each hero plays differently, all heroes hit balance targets, owner plays one run each
@@ -76,7 +76,7 @@ Full tasks with acceptance criteria are in `tasks/todo.md`.
 
 ### Phase 5: Feel and onboarding (any order, can run in parallel)
 - [x] Task 12: Tap-to-preview on touch screens (tap again to play)
-- [ ] Task 13: Idle animations on hero cards
+- [x] Task 13: Idle animations on hero cards
 - [ ] Task 14: Guided first game (tutorial)
 
 ### Checkpoint E: complete — docs (README, CLAUDE.md, design doc) updated

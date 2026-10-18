@@ -14,7 +14,9 @@ Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit mu
   match (the same layout on both sides), so openings don't repeat. Combos (relays, captures, extra turns) earn coins;
   coins buy one-use power marbles (guli sakti). Losing costs spirit (semangat); run out and the run ends.
   The run saves automatically whenever the map is shown.
-  Hero powers are shown on the hero cards but are not active yet.
+  Each hero has an active passive power: Hang Tuah's keris steals seeds on combos, Mahsuri survives
+  her first defeat that would end the run, and Badang drops bonus seeds in his rumah. Hero stats and
+  Mahsuri's second power are not active yet.
 
 Hovering one of your holes (mouse or keyboard) previews where the last seed of its first sowing lands
 (Settings → Move preview). On a touch screen, tap a hole once to preview it and tap it again to play.
@@ -38,11 +40,11 @@ node test/selfplay.js
 Classic AI-vs-AI games: checks no seeds go missing, every game finishes, and how fast the Hard level is.
 
 ```
-node test/rogue.js [runs] [playerDepth] [playerRandom]
+node test/rogue.js [runs] [playerDepth] [playerRandom] [hero]
 ```
 
 Simulates whole roguelite runs with a computer player and prints win rates per area, coins per match,
-and checks that maps and runs are valid. Run it after any rule, economy or difficulty change.
+and checks that maps and runs are valid. `hero` can be none, tuah, mahsuri, badang or all. Run it after any rule, economy or difficulty change.
 
 Add `?debug` to the URL to expose a read-only `window.congkakDebug` for automated browser testing.
 

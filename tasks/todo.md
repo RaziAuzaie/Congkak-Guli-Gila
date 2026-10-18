@@ -15,6 +15,10 @@ Standard checks for every task (the "Definition of Done" from `CLAUDE.md`):
 
 ## Task 1: Engine counts combo hits
 
+> Partly done with the hero passives (2026-10-18): the engine now keeps `fx.combo` for Keris Taming
+> Sari, but `game.js` and `test/rogue.js` still count combos for coins on their own (same rules).
+> Remaining: emit `hit` events and drop the duplicate counting.
+
 **Description:** Move combo counting into the engine so hero powers can use it. `playMove` keeps a
 per-player counter in `state.fx.combo` (relay pick-ups after the first pick, captures, extra turns),
 resets it when the turn passes, and emits `{ t: 'hit', kind, combo, n }` events. `game.js` and
@@ -61,53 +65,60 @@ accepts a 4th argument `hero` (`tuah` | `mahsuri` | `badang` | `all`) and prints
 
 ## Phase 2: Hero powers
 
-## Task 3: Badang — Kekuatan Badang
+## Task 3: Badang — Kekuatan Badang (done, without Task 2)
+
+> Done 2026-10-18. Bonus seed is created (not from his hand). Capped at 3 per turn after the sim
+> showed ~99% run wins uncapped; capped: 82% (depth 3) / 35% (depth 2).
 
 **Description:** When Badang's sowing passes his own rumah he drops 2 seeds there instead of 1
 (assumed: the extra seed is a bonus, not from his hand — see open question 1). Switched on with
 `createGame` opts `powers: ['badang', null]`. The UI shows a small "+1" on the rumah and a sound.
 
 **Acceptance criteria:**
-- [ ] Engine adds the bonus only for the player who has the power, only on their own rumah
-- [ ] Classic mode and other heroes behave exactly as before
-- [ ] Move preview (`firstLanding`) still points at the right hole
+- [x] Engine adds the bonus only for the player who has the power, only on their own rumah
+- [x] Classic mode and other heroes behave exactly as before
+- [x] Move preview (`firstLanding`) still points at the right hole
 
 **Verification:**
-- [ ] Selfplay ALL OK (classic seed conservation untouched)
-- [ ] `node test/rogue.js 200 3 0.15 badang` runs; note win rate
-- [ ] Browser: play as Badang, see the +1 when passing the rumah, store count matches
+- [x] Selfplay ALL OK (classic seed conservation untouched)
+- [x] `node test/rogue.js 200 3 0.15 badang` runs; note win rate
+- [x] Browser: play as Badang, see the +1 when passing the rumah, store count matches
 
 **Dependencies:** Task 2
 **Files likely touched:** `js/engine.js`, `js/rogue.js`, `js/game.js`
 **Estimated scope:** Small
 
-## Task 4: Hang Tuah — Keris Taming Sari
+## Task 4: Hang Tuah — Keris Taming Sari (done)
+
+> Done 2026-10-18. Sim: 81% (depth 3) / 36% (depth 2). Rules checked over 400 Node games.
 
 **Description:** Every 2nd combo hit in Tuah's turn steals 1 seed from the opponent's rumah into his
 own, at most 3 per turn. Uses `fx.combo` from Task 1. Emits a `steal` event; UI animates a seed
 flying across with a keris toast.
 
 **Acceptance criteria:**
-- [ ] Steals on combo 2, 4, 6 only, max 3 per turn, never takes from an empty rumah
-- [ ] Count resets every turn; extra turns continue the same combo (as the combo pop-up does)
-- [ ] Toast text in BM and EN
+- [x] Steals on combo 2, 4, 6 only, max 3 per turn, never takes from an empty rumah
+- [x] Count resets every turn; extra turns continue the same combo (as the combo pop-up does)
+- [x] Toast text in BM and EN
 
 **Verification:**
-- [ ] `node test/rogue.js 200 3 0.15 tuah` runs; note win rate
+- [x] `node test/rogue.js 200 3 0.15 tuah` runs; note win rate
 - [ ] Browser: a relay chain as Tuah shows steals at the right combo numbers
 
 **Dependencies:** Task 1, Task 2
 **Files likely touched:** `js/engine.js`, `js/rogue.js`, `js/game.js`
 **Estimated scope:** Medium
 
-## Task 5: Mahsuri — Darah Putih and Sumpahan Mahsuri
+## Task 5: Mahsuri — Darah Putih and Sumpahan Mahsuri (Darah Putih done)
+
+> Darah Putih done 2026-10-18 (sim: 90% / 36%). Sumpahan Mahsuri not started.
 
 **Description:** Both live in `rogue.js`. Darah Putih: the first time her spirit would reach 0 she
 survives with 15 (once per run, saved as `run.revived`). Sumpahan: after she loses a match, her next
 opponent starts with the hole nearest their rumah burnt (`run.curse`, cleared after that match).
 
 **Acceptance criteria:**
-- [ ] Revive happens once; a second death ends the run
+- [x] Revive happens once; a second death ends the run
 - [ ] Curse applies to the very next match only, including a boss retry
 - [ ] Match result screen says when the revive or curse triggers (BM + EN)
 - [ ] Old saves without these fields load fine
@@ -271,17 +282,18 @@ it; a second tap on the same hole plays. vs Computer and Roguelite only (not 2-p
 **Files likely touched:** `js/pixel.js`, `js/game.js`
 **Estimated scope:** Small
 
-## Task 13: Idle animations on hero cards
+## Task 13: Idle animations on hero cards (done)
 
-**Description:** Small 2-frame idle loops: Tuah's keris glints, Mahsuri's selendang/kebaya sways,
-Badang's boulder bobs. Pure CSS or swapping a few pixels; respects `prefers-reduced-motion`.
+**Description:** Each portrait's upper body drops 1 pixel every other beat (a breath; Badang's
+boulder sinks onto his arms). Hang Tuah's keris glints from hilt to tip; Mahsuri's hair pin and middle
+kerongsang twinkle. Set per hero in `HERO_ART[*].idle`, animated with CSS; hero select only.
 
 **Acceptance criteria:**
-- [ ] Each hero has an idle loop that keeps their legend recognisable
-- [ ] No animation when the OS asks for reduced motion
+- [x] Each hero has an idle loop that keeps their legend recognisable
+- [x] No animation when the OS asks for reduced motion
 
 **Verification:**
-- [ ] Browser: hero select looks right on desktop and phone width
+- [x] Browser: hero select checked frame by frame
 
 **Dependencies:** None
 **Files likely touched:** `js/game.js`, `style.css`
