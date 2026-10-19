@@ -93,6 +93,40 @@ body {
 .player-bar .store-count b { font-family: var(--font-display); font-size: 18px; color: var(--gold); margin-left: 4px; }
 .pvp .player-bar.top { transform: rotate(180deg); }
 
+/* ---------- fighters (roguelite portraits) ---------- */
+/* The arena keeps bars + board together so the portraits can sit in the margin to its left. */
+.arena { position: relative; width: min(100%, 980px); display: flex; flex-direction: column; gap: 14px; }
+.fighters { display: none; }
+.bar-art { display: none; }
+body.rogue .bar-art:not(:empty) { display: flex; align-items: flex-end; margin-right: -2px; }
+.bar-art svg { height: 26px; width: auto; }
+.fighter {
+  --bd: var(--ink); width: 128px; display: flex; flex-direction: column; align-items: center;
+  background: var(--panel); padding: 10px 6px 6px;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--bd), 0 var(--px) 0 0 var(--bd),
+    calc(-1 * var(--px)) 0 0 0 var(--bd), var(--px) 0 0 0 var(--bd);
+}
+.fighter.turn { --bd: var(--gold); }
+.fighter-stage {
+  width: 100%; height: 132px; display: grid; place-items: end center; padding-bottom: 6px;
+  background: linear-gradient(180deg, #1b2a20 0 72%, #23382a 72%);
+}
+.fighter .hero-art { --hero-px: 4px; max-width: 100%; }
+.fighter-name { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--gold); text-align: center; line-height: 1.15; }
+.fighter-title { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.2; }
+/* Wide screens: portraits in the margin, opponent level with its bar, hero below it */
+@media (min-width: 1260px) and (min-height: 560px) {
+  body.rogue .fighters:not(:empty) {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+    position: absolute; top: 0; bottom: 0; right: calc(100% + 28px);
+  }
+  body.rogue .bar-art { display: none !important; }
+}
+/* Orang Bunian flickers in and out of sight */
+.hero-art.fade { animation: unseen 3.4s steps(1, end) infinite; }
+@keyframes unseen { 0% { opacity: 1; } 40% { opacity: .55; } 46% { opacity: .2; } 52% { opacity: .7; } 70% { opacity: 1; } }
+
 /* ---------- board ---------- */
 .board-wrap { position: relative; }
 .board { display: flex; justify-content: center; }
@@ -341,7 +375,7 @@ body {
 .hero-art .hero-spark { opacity: 0; animation: hero-spark var(--glint) steps(1, end) infinite; }
 @keyframes hero-breathe { 0% { transform: translateY(0); } 50% { transform: translateY(1px); } }
 @keyframes hero-spark { 0% { opacity: 1; } 5% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .hero-art .hero-up, .hero-art .hero-spark { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-art .hero-up, .hero-art .hero-spark, .hero-art.fade { animation: none; } }
 .hero-card h3 { margin: 4px 0 0; font-size: 20px; color: var(--gold); text-shadow: 2px 2px 0 var(--ink); }
 .hero-style { margin: 0; font-size: 13.5px; color: var(--muted); text-align: center; }
 .hero-info { display: contents; }

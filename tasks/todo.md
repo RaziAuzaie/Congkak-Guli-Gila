@@ -181,8 +181,8 @@ The opponent's power is shown on the fight toast and in the match header.
 ## Task 8: Toyol steals seeds
 
 **Description:** New Hutan Rimba opponent Toyol (see open question 2). Each time his sowing skips
-your rumah he takes 1 seed from your fullest hole into his rumah. Needs a small faceless pixel
-portrait or icon for the map toast if enemies get art later; text only for now.
+your rumah he takes 1 seed from your fullest hole into his rumah. Needs his own faceless sprite
+in `ENEMY_ART` (every other opponent has one; see Task 15).
 
 **Acceptance criteria:**
 - [ ] Steal happens on every skip of your rumah, deterministic target, `steal` event animated
@@ -314,6 +314,25 @@ and once on first launch.
 
 **Dependencies:** None (Task 12 helps on phones)
 **Files likely touched:** `js/game.js`, `style.css`
+**Estimated scope:** Medium
+
+## Task 15: Opponent portraits beside the board (done)
+
+**Description:** All 15 opponents have a faceless pixel sprite with an idle loop in `ENEMY_ART`
+(Orang Bunian flickers; Hang Jebat is Tuah's sprite mirrored with a black-and-red palette). In a
+roguelite match the opponent's portrait sits left of the board, the hero's below it; under 1260px
+wide, small copies show in the name bars instead.
+
+**Acceptance criteria:**
+- [x] Every opponent has a recognisable sprite and idle loop
+- [x] Portraits show only in roguelite matches; classic mode is unchanged
+- [x] No animation when the OS asks for reduced motion
+
+**Verification:**
+- [x] Browser: sprite gallery, a match at 1440px and at phone width
+
+**Dependencies:** None
+**Files likely touched:** `js/game.js`, `index.html`, `style.css`
 **Estimated scope:** Medium
 
 ### Checkpoint E: complete

@@ -17,6 +17,7 @@ Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit mu
   Each hero has an active passive power: Hang Tuah's keris steals seeds on combos, Mahsuri survives
   her first defeat that would end the run, and Badang drops bonus seeds in his rumah. Hero stats and
   Mahsuri's second power are not active yet.
+  Every opponent has an animated pixel portrait, shown left of the board during its match with your hero below it.
 
 Hovering one of your holes (mouse or keyboard) previews where the last seed of its first sowing lands
 (Settings → Move preview). On a touch screen, tap a hole once to preview it and tap it again to play.
@@ -55,7 +56,7 @@ Add `?debug` to the URL to expose a read-only `window.congkakDebug` for automate
 | `js/engine.js` | Rules engine — pure logic, no DOM. Sowing, relay, tembak, rumah, hangus, rounds, marble effects. |
 | `js/ai.js` | Computer opponent — minimax + alpha-beta. Easy / Medium / Hard, or a custom search depth. |
 | `js/rogue.js` | Roguelite run logic — no DOM. Heroes, maps, opponents, marbles, coins, shop, rest, events. |
-| `js/game.js` | UI: menus, animation, sounds, roguelite screens, hero portraits, BM/EN text. |
+| `js/game.js` | UI: menus, animation, sounds, roguelite screens, hero and opponent portraits, BM/EN text. |
 | `js/pixel.js` | Pixel-art canvas board renderer and input (hover, keyboard, marble targeting, preview). |
 | `js/music.js` | 8-bit Lagu Asli and Joget music (Web Audio). |
 | `style.css` | Look & feel (wooden board, modals, map, shop, hero cards). |

@@ -338,15 +338,240 @@
     },
   };
 
-  /** Multi-colour pixel art: each run of same-colour pixels becomes one rect. */
+  // ---------- Opponent portraits (same format as HERO_ART, shown beside the board in a match) ----------
+  // idle.fade: the whole sprite flickers (for the unseen Orang Bunian).
+  // flip + from: mirror another sprite and swap its palette (Hang Jebat is Tuah's sworn-brother mirror).
+  const SKIN = { k: '#1a0d05', s: '#c98a5a', S: '#9a6238' };
+  const ENEMY_ART = {
+    // Village kid in a yellow tee, his gasing (spinning top) at his feet.
+    budak: {
+      pal: { ...SKIN, s: '#d29a68', S: '#a46c42', h: '#1a1a24', y: '#e8b23a', Y: '#b88320', b: '#3a5a8c',
+        g: '#b8322c', G: '#f2c14e' },
+      idle: { up: 8, beat: 1, glint: 0.9, sparkle: [[1, 17, 0], [2, 17, 0.3], [3, 17, 0.6]] }, // the top spins
+      grid: [
+        '.........kkkkk.....', '........khhhhhk....', '.......khhhhhhhk...', '.......khssssShk...',
+        '.......kssssssSk...', '.......kssssssSk...', '........ksssSSk....', '..........kssk.....',
+        '.......kkyyyyykk...', '......kyyyyyyyyyk..', '......kykyyyyyYkyk.', '......kykyyyyyYkyk.',
+        '......kskyyyyyYksk.', '......kskyyyyyYksk.', '......kkkbbbbbbkkk.', '........kbbbbbbk...',
+        '.kkk....kbbkkbbk...', 'kgggk...ksk..ksk...', 'kGGGk...ksk..ksk...', '.kgk....ksk..ksk...',
+        '..k....kkkk..kkkk..',
+      ],
+    },
+    // Shop auntie: pink tudung, flowered baju kurung, batik sarong, a coin ready in her hand.
+    makcik: {
+      pal: { ...SKIN, t: '#c2577a', T: '#8e3a58', c: '#3f8a6a', C: '#2c6a50', f: '#f2c14e', g: '#f2c14e',
+        p: '#6b3e7a', P: '#4e2a5a', M: '#d9a441' },
+      idle: { up: 10, beat: 1.8, glint: 2.6, sparkle: [[2, 15]] },
+      grid: [
+        '.....kkkkkk.....', '....kttttttk....', '...kttttttttk...', '...kttsssSttk...',
+        '...ktssssSStk...', '...ktssssSStk...', '...kttssSSttk...', '..kttttttttttk..',
+        '.ktttttttttttTk.', '.kttttttttttTTk.', '.kckttttttTTkck.', '.kckcccfccCCkck.',
+        '.kckcfccccfCkck.', '.kckcccccccCkck.', '.kskcccfcccCksk.', '.kgkcccccccCkkk.',
+        '..kkpppMpppPk...', '...kppMpppMPk...', '...kpppMpppPk...', '...kpMpppMpPk...',
+        '...kpppppppPk...', '...kpppMpppPk...', '....ksk..ksk....', '...kkkk..kkkk...',
+      ],
+    },
+    // Village religious teacher: white kopiah, white beard, green jubah, gold tasbih beads.
+    lebai: {
+      pal: { ...SKIN, s: '#b8794a', S: '#8a5430', w: '#f1ead8', W: '#c9bfa6', e: '#e8e2d4', j: '#2f5d4a',
+        J: '#1f4235', g: '#f2c14e' },
+      idle: { up: 10, beat: 2.6, glint: 2.4, sparkle: [[3, 15], [3, 16], [2, 17], [3, 18], [2, 19]] }, // counting beads
+      grid: [
+        '.....kkkkkk.....', '....kwwwwwWk....', '....kwwwwwWk....', '....kkkkkkkk....',
+        '....ksssssSk....', '....ksssssSk....', '....keeeeeek....', '....keeeeeek....',
+        '.....keeeek.....', '...kkkjeejkkk...', '..kjjjjjjjjjjk..', '.kjjkjjjjjjkjjk.',
+        '.kjjkjjjjjjkjJk.', '.kjjkjjjjjjkjJk.', '.ksskjjjjjjksSk.', '.kkgkjjjjjjkkkk.',
+        '...gkjjjjjjk....', '..g.kjjjjjjk....', '...gkjjjjjjk....', '..g.kjJjjJjk....',
+        '...kjjJjjJjjk...', '...kjjJjjJjjk...', '..kjjjJjjJjjjk..', '..kkkkkkkkkkkk..',
+        '....ksk..ksk....', '...kkkk..kkkk...',
+      ],
+    },
+    // The fortune teller: songkok with his namesake grasshopper on top, gazing orb in both hands.
+    belalang: {
+      pal: { ...SKIN, c: '#26222a', G: '#7ac74f', o: '#d9772e', O: '#a8541c', p: '#9b6bff', P: '#5a3aa8',
+        t: '#3b2a4a', T: '#2a1d36' },
+      idle: { up: 10, beat: 2, glint: 1.6, sparkle: [[7, 15, 0], [8, 16, 0.8]] },
+      grid: [
+        '......k...k.....', '.......kGGGGk...', '....kkkkkkkk....', '....kcccccck....',
+        '....kcccccck....', '....ksssssSk....', '....ksssssSk....', '....ksssssSk....',
+        '.....ksssSk.....', '......kssk......', '...kkkooookkk...', '..kooooooooOOk..',
+        '.koooooooooOOOk.', '.kokooooooOOkOk.', '.kokoooooooOkOk.', '.kokookppkoOkOk.',
+        '..kssspPPpsssk..', '...kkkkppkkkk...', '....koooooOk....', '....ktttttTk....',
+        '....ktttttTk....', '....kttkkTtk....', '....ktk..ktk....', '....ktk..ktk....',
+        '...kkkk..kkkk...',
+      ],
+    },
+    // Sang Kancil, the clever mouse-deer: small, alert, one ear always twitching.
+    kancil: {
+      pal: { k: '#1a0d05', b: '#a8683a', B: '#7a4a26', l: '#e8c9a0', w: '#f4f8fb' },
+      idle: { up: 8, beat: 1.1, glint: 3, sparkle: [[14, 4]] }, // a knowing wink
+      grid: [
+        '.............k.k....', '............kbkbk...', '............kbkbk...', '...........kbbbbbk..',
+        '...........kbbkbbbk.', '...........kbbbbbbbk', '...........kbbbbkkk.', '..........kbbbbk....',
+        '..k......kbbbbk.....', '.kbk..kkkbbbbbk.....', '.kbbkkbbbbbbbbk.....', '..kbbbbbbbbbbbBk....',
+        '..kbbbbbbbbbbbBk....', '..kBllllllllllBk....', '...kbBk....kbBk.....', '...kbk.....kbk......',
+        '...kbk.....kbk......', '...kbk.....kbk......', '...kkk.....kkk......',
+      ],
+    },
+    // Jungle shaman: red tengkolok, grey beard, dark baju, staff topped with a frost-blue charm.
+    pawang: {
+      pal: { ...SKIN, s: '#a8724a', S: '#7a4a2a', R: '#b8322c', r: '#8e1f1f', e: '#d9d4c8', d: '#2b2b3a',
+        D: '#1c1c26', g: '#f2c14e', w: '#6b3e1e', c: '#7fd3ff' },
+      idle: { up: 10, beat: 2.4, glint: 2, sparkle: [[2, 1, 0], [2, 2, 0.12]] },
+      grid: [
+        '..k.............', '.kck....kk......', '.kck..kkRRk.....', '..w..kRRRRRk....',
+        '..w..kRrRrRRk...', '..w..kkkkkkkk...', '..w..ksssssSk...', '..w..ksssssSk...',
+        '..w..keeeeeek...', '..w...keeeek....', '..wkkkddeeddkkk.', '..kddddddddddDk.',
+        '.kdkddddddddkDk.', '.kdkddddgdddkDk.', '.kskdddddgddkDk.', '.kwkddddddddkkk.',
+        '..wkddddddddk...', '..wkdrdrdrdrk...', '..wkrdrdrdrdk...', '..wkDddddddDk...',
+        '..wkddddddddk...', '..wkdddkkdddk...', '..w.ksk..ksk....', '..w.ksk..ksk....',
+        '.kkkkkk..kkkk...',
+      ],
+    },
+    // The unseen folk: a hooded, glowing figure with no feet, flickering in and out.
+    bunian: {
+      pal: { k: '#1a2a22', w: '#d8f2e0', W: '#9fc9b0', d: '#0f1d16', g: '#e8f7a0' },
+      idle: { up: 7, beat: 2, glint: 1.4, fade: true, sparkle: [[2, 12, 0], [13, 12, 0.2], [3, 12, 0.4], [12, 12, 0.6]] },
+      grid: [
+        '......kkkk......', '.....kwwwwk.....', '....kwwwwwWk....', '...kwwddddWWk...',
+        '...kwddddddWk...', '...kwddddddWk...', '...kwwddddWWk...', '..kwwwwwwwwWWk..',
+        '..kwwwwwwwwWWk..', '.kwwkwwwwwwkWWk.', '.kwwkwwwwwwkWWk.', '.kwwkwwwwwwkWWk.',
+        '.kggkwwwwwwkggk.', '..kkkwwwwwWkkk..', '....kwwwwwwWk...', '....kwwwwwwWk...',
+        '...kwwwwwwwWWk..', '...kwwwwwwwWWk..', '..kwwwwwwwwWWWk.', '..kwwwwwwwwWWWk.',
+        '...kWk.kWk.kWk..', '....k...k...k...',
+      ],
+    },
+    // Mat Jenin the daydreamer: kopiah, blue baju, a thought bubble full of gold.
+    penarik: {
+      pal: { ...SKIN, w: '#f1ead8', W: '#c9bfa6', b: '#5a8cc9', B: '#3a6a9a', p: '#3b3b4a', o: '#f6ead2',
+        g: '#f2c14e', G: '#c99a2e' },
+      idle: { up: 13, beat: 2.6, glint: 1.8, sparkle: [[11, 1, 0], [12, 2, 0.5]] },
+      grid: [
+        '..........kkkk..', '.........koggok.', '.........kogGok.', '..........kkkk..',
+        '.......kk.......', '...kkkkkkkk.....', '...kwwwwwWk.....', '...kkkkkkkk.....',
+        '...ksssssSk.....', '...ksssssSk.....', '...ksssssSk.....', '....ksssSk......',
+        '.....kssk.......', '..kkkbbbbkkk....', '.kbbbbbbbbbBk...', '.kbkbbbbbbkBk...',
+        '.kbkbbbbbbkBk...', '.kbkbbbbbbkBk...', '.kskbbbbbbksk...', '.kkkppppppkkk...',
+        '...kppppppk.....', '...kppkkppk.....', '...kpk..kpk.....', '...ksk..ksk.....',
+        '..kkkk..kkkk....',
+      ],
+    },
+    // Gergasi Bota: horned jungle giant with tusks, glowing eyes and a big club.
+    bota: {
+      pal: { k: '#1a0d05', g: '#5a7a3a', G: '#3f5a28', h: '#e8e2d4', t: '#f4f8fb', e: '#ff5b3a', y: '#f2c14e',
+        l: '#7a3a1e', L: '#5a2814', c: '#6b3e1e', C: '#8a5a2e' },
+      idle: { up: 10, beat: 1.4, glint: 2.2, sparkle: [[8, 5, 0], [13, 5, 0]] }, // the eyes flare
+      grid: [
+        '.....k..........k.....', '....khk........khk....', '....khhkkkkkkkkhhk....', '.....kggggggggggk.....',
+        '....kggggggggggGGk....', '....kgggeggggegGGk....', '....kggggggggggGGk....', '....kggtggggggtgGk....',
+        '.....kgtkkkkkktGk.....', '......kkggggggkk......', '...kkkggggggggggkkk...', '..kggggggggggggggggk..',
+        '.kgggkggggggggggkgGGk.', '.kgggkggggggggggkgGGk.', '.kyyykggggggggggkyyyk.', '.kgggkggggGGggggkgGGk.',
+        '.kgggkggggggggggkgGGk.', '.kgggkllllllllllkgGGk.', '.kgggkllllLLllllkgGGk.', '.kgggkllllLLllllkgGGk.',
+        '.kgggkLllllllllLkgggk.', '..kkkkLllllllllLkkcCk.', '......kggggggggk.kcCk.', '......kgggkkgggk.kcCk.',
+        '......kgggkkgggk.kcCk.', '......kgggkkgggkkccCCk', '......kgggkkgggkkccCCk', '......kgggkkgggkkcCCCk',
+        '.....kggggkkggggkkkkkk', '.....kkkkkkkkkkkk.....',
+      ],
+    },
+    // Hang Jebat: Tuah's mirror image in black tanjak and blood-red baju.
+    jebat: {
+      from: 'tuah', flip: true,
+      pal: { t: '#2a2a30', g: '#c9a227', b: '#7a1f1f', B: '#a83232', r: '#1a1a24', p: '#1f1712' },
+      idle: { up: 19, beat: 1.3, glint: 1.8, sparkle: [[15, 6], [14, 5], [15, 4], [14, 3], [15, 2], [15, 1]] },
+    },
+    // Palace guard: royal yellow uniform, blue tengkolok, spear with a red tassel.
+    pengawal: {
+      pal: { ...SKIN, y: '#e8b23a', Y: '#b88320', g: '#fff3b0', t: '#2b3a6b', T: '#4a5c96', w: '#6b3e1e',
+        m: '#c9d3da', M: '#f4f8fb', r: '#b8322c', p: '#2a2018' },
+      idle: { up: 13, beat: 3, glint: 3, sparkle: [[13, 1, 0], [13, 2, 0.12], [13, 3, 0.24]] },
+      grid: [
+        '.............k..', '............kMk.', '............kmk.', '............kmk.',
+        '.....kkkk...rwr.', '....kTTTTk...w..', '...kttttttk..w..', '...kkkkkkkk..w..',
+        '...ksssssSk..w..', '...ksssssSk..w..', '...ksssssSk..w..', '....ksssSk...w..',
+        '.....kssk....w..', '..kkkyyyykkk.w..', '.kyyyyyyyyyYkw..', '.kykyyyyyykYkw..',
+        '.kykyygyyykYkw..', '.kykyyyyyyksssk.', '.kskyygyyykkkwk.', '.kkkppppppk..w..',
+        '...kppppppk..w..', '...kryryryk..w..', '...kyryryrk..w..', '...kppkkppk..w..',
+        '...kpk..kpk..w..', '...kpk..kpk..w..', '...ksk..ksk..w..', '..kkkk..kkkkkwk.',
+      ],
+    },
+    // The grand vizier: tall gold tengkolok, grey beard, purple robe, an unrolled decree.
+    bendahara: {
+      pal: { ...SKIN, g: '#f2c14e', G: '#a87822', e: '#c9c4b8', v: '#4a2d6b', V: '#33204b', w: '#f1ead8',
+        W: '#c9bfa6' },
+      idle: { up: 9, beat: 2.4, glint: 2.8, sparkle: [[7, 1, 0], [6, 2, 0.15], [9, 2, 0.3]] },
+      grid: [
+        '......kkkk......', '.....kggggk.....', '....kgGggGgk....', '....kggggggk....',
+        '....kkkkkkkk....', '....ksssssSk....', '....ksssssSk....', '....keeeeeek....',
+        '.....keeeek.....', '...kkkveevkkk...', '..kvvvvvvvvvVk..', '.kvvkvvgvvvkvVk.',
+        '.kvvkvvgvvvkvVk.', '.kvvkvvgvvvkvVk.', '.kvvkvvgvvvkvVk.', '.kssWwwwwwwWssk.',
+        '..kkWwwwwwwWkk..', '...kvvvvvvvvk...', '...kvvgvvgvvk...', '...kvvvvvvvVk...',
+        '..kvvvgvvgvvVk..', '..kvvvvvvvvvVk..', '..kvgvvgvvgvVk..', '..kkkkkkkkkkkk..',
+        '....ksk..ksk....', '...kkkk..kkkk...',
+      ],
+    },
+    // The admiral: white tanjak, navy coat with gold, red cape, pedang held high.
+    laksamana: {
+      pal: { ...SKIN, n: '#23365c', N: '#3a5590', g: '#f2c14e', t: '#e8e2d4', T: '#b8b0a0', m: '#c9d3da',
+        M: '#f4f8fb', w: '#6b3e1e', c: '#b8322c', C: '#8e1f1f', p: '#1a1a24' },
+      idle: { up: 11, beat: 1.8, glint: 2.2, sparkle: [[15, 1], [15, 2], [15, 3], [15, 4], [15, 5], [15, 6]] },
+      grid: [
+        '...............k..', '..............kMk.', '.......kk.....kmk.', '.....kkttk....kmk.',
+        '....kttttTk...kmk.', '....kkkkkkkk..kmk.', '....ksssssSk..kmk.', '....ksssssSk..kmk.',
+        '....ksssssSk..kmk.', '.....ksssSk...kmk.', '......kssk...kgggk', '...kkknnnnkk.ksssk',
+        '..knnnnnnnnnNkNk..', '.cknkngnnnnkNNk...', '.cknkngnnnnkNk....', '.cknkngnnnnkk.....',
+        '.cksknnnnnnk......', '.ckkkggggggk......', '.cc.kppppppk......', '.cc.kppppppk......',
+        '.cC.kppkkppk......', '.Cc.kpk..kpk......', '.C..kpk..kpk......', '...kkkk..kkkk.....',
+      ],
+    },
+    // Chief of the guard: black tengkolok, gold pauldrons, round shield, keris pointed down.
+    temenggung: {
+      pal: { ...SKIN, t: '#1a1a24', g: '#f2c14e', G: '#a87822', r: '#7a1f1f', R: '#a83232', m: '#8a8f99',
+        M: '#c9d3da', p: '#2a2018' },
+      idle: { up: 9, beat: 2, glint: 2.6, sparkle: [[3, 14, 0], [14, 19, 1.3]] },
+      grid: [
+        '......kkkkk.......', '.....kttgtttk.....', '....kttttttttk....', '.....kkkkkkkk.....',
+        '.....ksssssSk.....', '.....ksssssSk.....', '.....ksssssSk.....', '......ksssSk......',
+        '.......kssk.......', '...kkkkrrrrkkkk...', '..kgggrrrrrrgggk..', '..kRRkrrgrrRkRRk..',
+        '.kkkkkrrgrrRkRRk..', 'kMmmmkrrgrrRkRRk..', 'kmmgmkrrgrrRkRRk..', 'kmgggkrrgrrRkRRk..',
+        'kmmgmkggggggkssk..', '.kmmkkppppppkkMk..', '..kk.kppppppk.M...', '.....kppkkppk.M...',
+        '.....kpk..kpk.....', '.....kmk..kmk.....', '.....kmk..kmk.....', '....kkkk..kkkk....',
+      ],
+    },
+    // Puteri Gunung Ledang: gold crown, long hair under a veil, purple gown, floating on cloud.
+    ledang: {
+      pal: { k: '#2a1a3a', g: '#f2c14e', G: '#c99a2e', p: '#ff8fb1', s: '#e0b088', S: '#b88560', h: '#1a1a24',
+        v: '#e8d8f8', V: '#b8a8d8', d: '#8a5ad8', D: '#5a3aa8', c: '#f6ead2', C: '#c9c0d8' },
+      idle: { up: 10, beat: 2.6, glint: 2.4, sparkle: [[6, 0, 0], [8, 0, 0.12], [9, 0, 0.24], [11, 0, 0.36], [7, 2, 1.2], [10, 2, 1.32]] },
+      grid: [
+        '......g.gg.g......', '......gggggg......', '.....kgpggpgk.....', '....khhhhhhhhk....',
+        '...kvhsssssShvk...', '...kvhsssssShvk...', '...kvhsssssShvk...', '...kvhhssSShhvk...',
+        '..kvvhhhsshhhvVk..', '..kvvhhkddkhhvVk..', '.kvvvkddgddddkvVk.', '.kvvkddddgddddkVk.',
+        '.kvvkdddgdddddkVk.', '.kvvkddddddddDkVk.', 'kvvkdddgddddddDkVk', 'kvvkdddddddddDDkVk',
+        'kvvkddgdddddgdDkVk', 'kvvkddddddddddDkVk', '.kvkdddgddddgdDkk.', '..kkdddddddddDDk..',
+        '..kddgdddddgdddDk.', '..kddddddddddddDk.', '.ckdddgdddddgddDkc', 'cckkkkkkkkkkkkkkcc',
+        'cCcccCccccCcccCccc', '.CCcCCccCCccCCcCC.', '..CC..CC..CC..CC..',
+      ],
+    },
+  };
+
+  /** A sprite ready to draw: resolves ENEMY_ART's flip/from shorthand. */
+  function spriteArt(art) {
+    if (!art.from) return art;
+    const base = HERO_ART[art.from] || ENEMY_ART[art.from];
+    const w = Math.max(...base.grid.map((r) => r.length));
+    const grid = art.flip ? base.grid.map((r) => r.padEnd(w, '.').split('').reverse().join('')) : base.grid;
+    return { pal: { ...base.pal, ...art.pal }, grid, idle: art.idle || base.idle };
+  }
+
   /**
    * Multi-colour pixel art: each run of same-colour pixels becomes one rect.
    * The big portrait (no cls) also gets its idle loop: the rows above idle.up sit in a group
    * that drops 1px every other beat (a breath), drawn last so it overlaps the rows below,
    * and the sparkle pixels flash white.
    */
-  function heroSvg(id, cls) {
-    const { pal, grid, idle } = HERO_ART[id];
+  const heroSvg = (id, cls) => artSvg(HERO_ART[id], cls);
+  const enemySvg = (id, cls) => (ENEMY_ART[id] ? artSvg(spriteArt(ENEMY_ART[id]), cls) : '');
+  function artSvg(art, cls) {
+    const { pal, grid, idle } = art;
     const w = Math.max(...grid.map((r) => r.length));
     const anim = !cls && idle;
     let low = '', up = '';
@@ -368,7 +593,7 @@
       body += `<g class="hero-up" style="--beat: ${idle.beat}s; --glint: ${idle.glint || 0}s">${up}${sp}</g>`;
     }
     const size = cls ? '' : ` style="height: calc(var(--hero-px) * ${grid.length})"`;
-    return `<svg class="${cls || 'hero-art'}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${body}</svg>`;
+    return `<svg class="${cls || (anim && idle.fade ? 'hero-art fade' : 'hero-art')}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${body}</svg>`;
   }
   const marble = (id) => pxSvg(MARBLE, R.ITEMS[id].color, 'marble');
 
@@ -407,7 +632,29 @@
       bar.querySelector('.fx').innerHTML = fxChips(p);
       bar.querySelector('.store-count').innerHTML = `${t('store')}: <b>${view[C.STORE[p]]}</b>`;
       bar.classList.toggle('active', state.phase === 'play' && state.player === p);
+      const card = $('#fighter' + p);
+      if (card) card.classList.toggle('turn', state.phase === 'play' && state.player === p);
     }
+  }
+
+  /**
+   * Roguelite portraits: opponent on top, your hero below, in the margin left of the board
+   * (CSS hides them on narrow screens and shows the small copies in the name bars instead).
+   * Drawn once per match so the idle loops don't restart on every move.
+   */
+  function renderFighters() {
+    const side = $('#fighters');
+    const arts = [rogue() && run.hero && HERO_ART[run.hero] ? run.hero : null, rogue() ? match.m.enemy : null];
+    const card = (p, big, name, title) => `<div class="fighter" id="fighter${p}">
+        <div class="fighter-stage">${big}</div>
+        <div class="fighter-name">${esc(name)}</div>${title ? `<div class="fighter-title">${esc(title)}</div>` : ''}
+      </div>`;
+    let html = '';
+    if (arts[1]) html += card(1, enemySvg(arts[1]), R.ENEMIES[arts[1]].name, tx(R.ENEMIES[arts[1]].title));
+    if (arts[0]) html += card(0, heroSvg(arts[0]), R.HEROES[arts[0]].name, t('you'));
+    side.innerHTML = html;
+    $('#bar1 .bar-art').innerHTML = arts[1] ? enemySvg(arts[1], 'bar-mini') : '';
+    $('#bar0 .bar-art').innerHTML = arts[0] ? heroSvg(arts[0], 'bar-mini') : '';
   }
 
   function canUseItems() {
@@ -420,6 +667,7 @@
     board.setLegal(legal);
     board.setAiming(!!aiming);
     board.setFlipTop(mode === 'pvp');
+    if (!rogue() && $('#fighters').innerHTML) renderFighters(); // left the roguelite: clear the portraits
     renderBars();
     renderHud();
     renderTray();
@@ -1159,6 +1407,7 @@
     board.clearPicked();
     board.setPreview(null);
     previewing = false;
+    renderFighters();
     renderAll();
     closeModal();
     updateUI();

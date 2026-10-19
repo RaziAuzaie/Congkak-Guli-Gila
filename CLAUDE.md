@@ -37,7 +37,10 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
   (or as `L(ms, en)` pairs in `rogue.js`).
 - Pixel art is written as code: 7×7 icon grids (`ICONS`) and per-hero palette grids (`HERO_ART`).
   Original art only; hero portraits are faceless. Each hero's idle loop on hero select (breath +
-  sparkle pixels) is set in `HERO_ART[*].idle`.
+  sparkle pixels) is set in `HERO_ART[*].idle`. Opponents have the same kind of sprite in `ENEMY_ART`
+  (`idle.fade` = flicker; `from` + `flip` = mirrored hero with a new palette, used for Hang Jebat).
+  In a roguelite match the opponent's portrait sits left of the board with the hero below it
+  (`renderFighters`); on screens narrower than 1260px small copies show in the name bars instead.
 - Saved data lives in `localStorage`: `congkak.settings` and `congkak.run` (`run.v = 1`).
   If the run format changes, keep old saves loading or bump the version.
 - Check changes in the browser preview, and run both Node tests before committing.

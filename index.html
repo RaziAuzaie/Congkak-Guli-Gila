@@ -22,15 +22,20 @@
 
     <div id="hud" class="hud"></div>
 
-    <div class="player-bar top" id="bar1"><span class="name"></span><span class="fx"></span><span class="store-count"></span></div>
+    <div class="arena">
+      <!-- Roguelite: opponent and hero portraits in the left margin (small ones in the bars on narrow screens) -->
+      <aside id="fighters" class="fighters" aria-hidden="true"></aside>
 
-    <div class="board-wrap">
-      <div id="board" class="board"></div>
-      <div id="toast" class="toast"></div>
-      <div id="combo" class="combo" aria-live="polite"></div>
+      <div class="player-bar top" id="bar1"><span class="bar-art"></span><span class="name"></span><span class="fx"></span><span class="store-count"></span></div>
+
+      <div class="board-wrap">
+        <div id="board" class="board"></div>
+        <div id="toast" class="toast"></div>
+        <div id="combo" class="combo" aria-live="polite"></div>
+      </div>
+
+      <div class="player-bar bottom" id="bar0"><span class="bar-art"></span><span class="name"></span><span class="fx"></span><span class="store-count"></span></div>
     </div>
-
-    <div class="player-bar bottom" id="bar0"><span class="name"></span><span class="fx"></span><span class="store-count"></span></div>
 
     <div id="tray" class="tray"></div>
 
