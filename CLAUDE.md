@@ -65,12 +65,14 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
   Win bonus `8 + diff/4` (+10 elite, +25 boss). Marbles cost 6–22.
 - **Balance targets** (from `test/rogue.js`): strong bot (depth 3) wins ~88% of runs, average (depth 2)
   ~18%, weak (depth 1) ~0% but reaches area 2. Measured 2026-10-18 (200 runs, depth 3 / depth 2):
-  no hero 73% / 20%, Tuah 81% / 36%, Mahsuri 90% / 36%, Badang 82% / 35%. Heroes should stay roughly level.
+  no hero 73% / 20%, Tuah 81% / 36%, Mahsuri 90% / 36%, Badang 85% / 30% (2026-10-19, from-hand rule). Heroes should stay roughly level.
 - **Hero passives** (on in roguelite only; classic passes no `powers`):
   - Keris Taming Sari (Tuah, engine): every 2nd combo hit in his turn steals 1 seed from the opponent's
     rumah, max 3 per turn. Combo hits = relay pick-ups, captures, extra turns; extra turns keep the combo.
-  - Kekuatan Badang (engine): a bonus seed (created, not from his hand) when his sowing passes his own
-    rumah, max 3 per turn. Uncapped he won ~99% of sim runs.
+  - Kekuatan Badang (engine): when his sowing passes his own rumah he drops 2 seeds there, the 2nd taken
+    from his hand (no new seeds; the owner asked for this). Max 3 per turn; uncapped he won 100% of
+    strong sim runs. If the 2nd seed is his last, the sowing ends in his rumah = extra turn.
+    `firstLanding` applies the same rule, so the move preview is right for him.
   - Darah Putih (Mahsuri, `finishMatch`): the first time spirit hits 0 she survives with 15, once per run
     (`run.revived`).
 - **Easter egg:** tapping the "g" in the menu title 3 times shows heart rain and

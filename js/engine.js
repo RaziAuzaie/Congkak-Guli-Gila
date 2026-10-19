@@ -27,7 +27,7 @@
   const SIZE = 16;
   const MAX_STEPS = 5000;  // guard against pathological relay loops
   const KERIS_MAX = 3;     // Hang Tuah: steals per turn
-  const BADANG_MAX = 3;    // Badang: bonus seeds per turn (uncapped he won ~99% of sim runs)
+  const BADANG_MAX = 3;    // Badang: double drops in his rumah per turn
 
   function sidePits(p) {
     const base = p === 0 ? 0 : 8;
@@ -44,7 +44,7 @@
       shadow: [0, 0], lightning: [0, 0], shield: [0, 0], time: [0, 0],
       bold: [0, 0], frozen: new Array(SIZE).fill(0),
       // roguelite hero passives: powers[p] = 'tuah' | 'badang' | null;
-      // combo[p] = combo hits this turn, steals[p] = keris steals / Badang bonus seeds this turn
+      // combo[p] = combo hits this turn, steals[p] = keris steals / Badang double drops this turn
       powers: [null, null], combo: [0, 0], steals: [0, 0],
     };
   }
@@ -56,7 +56,7 @@
    *   burnt  array of SIZE booleans; burnt holes start empty
    *   bold   [p0, p1] extra turn after a capture
    *   single true = the game is one round; the round's end is the game's end
-   *   powers [p0, p1] hero passives: 'tuah' (keris steals) | 'badang' (bonus seed in own rumah) | null
+   *   powers [p0, p1] hero passives: 'tuah' (keris steals) | 'badang' (2 seeds from his hand into his own rumah) | null
    */
   function createGame(first = 0, opts = {}) {
     const holes = new Array(SIZE).fill(START_SEEDS);
@@ -97,6 +97,10 @@
       },
     };
   }
+
+  /** Kekuatan Badang: does this drop in p's own rumah get a 2nd seed from the hand? (max BADANG_MAX a turn) */
+  const badangDouble = (fx, p, pos, seedsLeft, used) =>
+    pos === STORE[p] && seedsLeft > 0 && fx.powers && fx.powers[p] === 'badang' && used < BADANG_MAX;
 
   function nextPos(pos, p, burnt, shadow) {
     do {
@@ -158,11 +162,12 @@
         seeds--;
         steps++;
         if (ev) ev.push({ t: 'drop', pos, hand: seeds });
-        // Kekuatan Badang: a bonus seed when his sowing passes his own rumah (capped per turn)
-        if (pos === STORE[p] && fx.powers[p] === 'badang' && fx.steals[p] < BADANG_MAX) {
+        // Kekuatan Badang: passing his own rumah he drops a 2nd seed there, from his hand
+        if (badangDouble(fx, p, pos, seeds, fx.steals[p])) {
           st.holes[pos]++;
+          seeds--;
           fx.steals[p]++;
-          if (ev) ev.push({ t: 'bonus', pos });
+          if (ev) ev.push({ t: 'bonus', pos, hand: seeds });
         }
       }
 
@@ -249,10 +254,12 @@
     let seeds = holes[pit];
     holes[pit] = 0;
     let pos = pit;
+    let used = s.fx.steals ? s.fx.steals[p] : 0;
     while (seeds > 0) {
       pos = nextPos(pos, p, s.burnt, s.fx.shadow[p]);
       holes[pos]++;
       seeds--;
+      if (badangDouble(s.fx, p, pos, seeds, used)) { holes[pos]++; seeds--; used++; } // same as playMove
     }
     return { pos, count: holes[pos], opposite: isStore(pos) ? 0 : holes[opposite(pos)] };
   }

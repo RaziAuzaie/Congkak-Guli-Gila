@@ -101,7 +101,8 @@
   };
 
   // ---------- heroes (chosen at the start of a run) ----------
-  // Passives are active: Tuah and Badang in the engine (opts.powers), Mahsuri's revive in finishMatch.
+  // Passives are active: Tuah and Badang in the engine (opts.powers, also in the move preview),
+  // Mahsuri's revive in finishMatch.
   // Stats and Mahsuri's second power are display-only for now.
   const REVIVE_HP = 15; // Darah Putih
 
@@ -126,8 +127,8 @@
     badang: {
       name: 'Badang',
       style: L('Kekuatan mentah', 'Raw power'),
-      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dan bukan 1 (maks 3 setiap giliran).',
-        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds there instead of 1 (max 3 per turn).'),
+      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dari tangan dan bukan 1 (maks 3 setiap giliran).',
+        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds from your hand there instead of 1 (max 3 per turn).'),
       second: null,
       stats: { hp: 50, coins: 10, slots: 2, items: 1 },
     },

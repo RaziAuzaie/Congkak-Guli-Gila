@@ -76,7 +76,7 @@
       leave: 'Keluar',
       chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
       lbl_bag: 'Beg', heroSoon: 'Kuasa pasif sudah aktif. Statistik wira dan kuasa kedua akan datang.',
-      kerisSteal: 'Keris Taming Sari! Curi 1 buah', badangBonus: 'Kekuatan Badang! +1',
+      kerisSteal: 'Keris Taming Sari! Curi 1 buah', badangBonus: 'Kekuatan Badang! 2 buah ke rumah',
       revived: 'Darah Putih! Mahsuri bangkit semula', revivedNote: 'Darah Putih menyelamatkan anda. Ia hanya sekali setiap pengembaraan.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
@@ -170,7 +170,7 @@
       leave: 'Leave',
       chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
       lbl_bag: 'Bag', heroSoon: 'Passive powers are active. Hero stats and second powers are coming soon.',
-      kerisSteal: 'Keris Taming Sari! Stole 1 seed', badangBonus: 'Kekuatan Badang! +1',
+      kerisSteal: 'Keris Taming Sari! Stole 1 seed', badangBonus: 'Kekuatan Badang! 2 seeds in the rumah',
       revived: 'Darah Putih! Mahsuri rises again', revivedNote: 'Darah Putih saved you. It works only once per run.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
@@ -900,9 +900,11 @@
           sfx('magic');
           await sleep(STEP * 4);
           break;
-        case 'bonus':
+        case 'bonus': // Badang's 2nd seed in his rumah, from his hand
           view[ev.pos]++;
+          hand = ev.hand;
           renderPit(ev.pos);
+          showHand(ev.pos, hand);
           flash(ev.pos);
           toast(t('badangBonus'));
           sfx('coin');

@@ -67,8 +67,9 @@ accepts a 4th argument `hero` (`tuah` | `mahsuri` | `badang` | `all`) and prints
 
 ## Task 3: Badang — Kekuatan Badang (done, without Task 2)
 
-> Done 2026-10-18. Bonus seed is created (not from his hand). Capped at 3 per turn after the sim
-> showed ~99% run wins uncapped; capped: 82% (depth 3) / 35% (depth 2).
+> Done 2026-10-18; changed 2026-10-19 at the owner's request: the 2nd seed now comes from his hand
+> (no new seeds), and the move preview uses the same rule. Capped at 3 per turn: 85% (depth 3) /
+> 30% (depth 2); uncapped 100% / 83%.
 
 **Description:** When Badang's sowing passes his own rumah he drops 2 seeds there instead of 1
 (assumed: the extra seed is a bonus, not from his hand — see open question 1). Switched on with
