@@ -29,6 +29,7 @@
     E:  { root: 'E2', fifth: 'B2', stab: 'G#3+D4' },
     F:  { root: 'F2', fifth: 'C3', stab: 'A3+C4' },
     Bb: { root: 'Bb2', fifth: 'F3', stab: 'Bb3+D4' },
+    C:  { root: 'C3', fifth: 'G2', stab: 'E4+G4' },
   };
 
   function fromChords(chords, pattern) {
@@ -48,8 +49,71 @@
     return out.join(' | ');
   }
 
+  /**
+   * Build a song's parts from sections, each { chords, lead, drum, fill?, gong?, quiet? }.
+   * fill = drum pattern for the section's last bar; quiet = bars at the start with no accordion.
+   */
+  function sections(list, harmPat, bassPat) {
+    const parts = { lead: [], harm: [], bass: [], drum: [] };
+    for (const s of list) {
+      const n = s.chords.length;
+      parts.lead.push(s.lead);
+      parts.harm.push(s.chords.map((c, b) =>
+        (b < (s.quiet || 0) ? harmPat.map(() => '.').join(' ') : fromChords([c], harmPat))).join(' | '));
+      parts.bass.push(fromChords(s.chords, bassPat));
+      parts.drum.push(Array.from({ length: n }, (_, b) => {
+        const bar = (b === n - 1 && s.fill ? s.fill : s.drum).slice();
+        if ((s.gong || [0]).includes(b)) bar[0] = bar[0] === '.' ? 'G' : bar[0] + '+G';
+        return bar.join(' ');
+      }).join(' | '));
+    }
+    for (const k in parts) parts[k] = parts[k].join(' | ');
+    return parts;
+  }
+
   // ---------- songs ----------
-  const JOGET_CHORDS = ['Am', 'Am', 'G', 'G', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'F', 'E', 'Am', 'Dm', 'E', 'Am'];
+  // Joget runs 64 bars (~54 s) so it doesn't feel like a short loop:
+  // A (main tune) → B (brighter, in the major) → A' (main tune, new answer phrase) → C (kompang break, low tune)
+  const JOGET_BEAT = ['D', '.', 'T', 'D', 'T', 't'];
+  const JOGET_FILL = ['T', 't', 'T', 'T', 't', 'T'];
+  const JOGET_PARTS = sections([
+    { // A: the original tune
+      chords: ['Am', 'Am', 'G', 'G', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'F', 'E', 'Am', 'Dm', 'E', 'Am'],
+      lead: `
+        A4 - C5 E5 - D5 | C5 - B4 A4 - - | G4 - A4 B4 - C5 | D5 - C5 B4 - - |
+        A4 - C5 E5 - A5 | G5 - F5 E5 - D5 | C5 - B4 G#4 - B4 | A4~ - - - . . |
+        E5 - E5 F5 - E5 | D5 - C5 D5 - - | C5 - C5 D5 - C5 | B4 - A4 B4 - - |
+        A4 - B4 C5 - D5 | E5 - F5 E5 - D5 | C5 - B4 A4 - G#4 | A4~ - - - . .`,
+      drum: JOGET_BEAT, fill: JOGET_FILL, gong: [0, 8],
+    },
+    { // B: brighter, leaning on F, G and C, ending on E to pull back home
+      chords: ['F', 'G', 'C', 'Am', 'F', 'G', 'E', 'E', 'Dm', 'Am', 'Dm', 'Am', 'F', 'G', 'E', 'E'],
+      lead: `
+        C5 - F5 A5 - G5 | F5 - E5 D5 - B4 | C5 - E5 G5 - E5 | E5 - D5 C5 - - |
+        A4 - C5 F5 - E5 | D5 - B4 G4 - B4 | G#4 - B4 E5 - D5 | B4~ - - - . . |
+        F5 - E5 D5 - F5 | E5 - C5 A4 - C5 | D5 - F5 A5 - G5 | E5 - D5 C5 - A4 |
+        C5 - D5 F5 - A5 | G5 - F5 D5 - G5 | E5 - D5 B4 - G#4 | B4 - - . E4 G#4`,
+      drum: JOGET_BEAT, fill: JOGET_FILL, gong: [0, 8],
+    },
+    { // A': the tune again with ornaments, then a new answer phrase
+      chords: ['Am', 'Am', 'G', 'G', 'Am', 'Dm', 'E', 'Am', 'Am', 'Dm', 'F', 'E', 'Am', 'Dm', 'E', 'Am'],
+      lead: `
+        A4~ - C5 E5 - D5 | C5 - B4 A4 - - | G4 - A4 B4~ - C5 | D5 - C5 B4 - - |
+        A4 - C5 E5 - A5~ | G5 - F5 E5 - D5 | C5 - B4 G#4 - B4 | A4~ - - - . . |
+        A5 - G5 E5 - C5 | D5 - F5 A5 - F5 | C5 - A4 C5 - F5 | E5 - D5 B4 - G#4 |
+        A4 - C5 E5 - A5 | F5 - E5 D5 - F5 | E5 - B4 D5 - G#4 | A4~ - - - . .`,
+      drum: JOGET_BEAT, fill: JOGET_FILL, gong: [0, 8],
+    },
+    { // C: four bars of kompang alone, then a low call-and-response tune back to the top
+      chords: ['Am', 'Am', 'Am', 'Am', 'Dm', 'Dm', 'Am', 'Am', 'F', 'G', 'Am', 'Am', 'Dm', 'E', 'Am', 'E'],
+      lead: `
+        . . . . . . | . . . . . . | . . . . . . | . . . . . . |
+        D4 - F4 A4 - - | A4 - G4 F4 - E4 | E4 - A4 C5 - - | C5 - B4 A4 - - |
+        F4 - A4 C5 - A4 | B4 - D5 G4 - B4 | A4 - E4 A4 - C5 | E5 - - . . . |
+        F5 - E5 D5 - C5 | B4 - C5 D5 - E5 | C5 - B4 A4 - E4 | G#4 - B4 E5 - -`,
+      drum: ['D', 't', 'T', 'D', 'T', 'T'], fill: JOGET_FILL, gong: [0, 4, 12], quiet: 4,
+    },
+  ], ['.', 'S', 'S', '.', 'S', 'S'], ['R', '-', '.', 'F', '-', '.']);
   const ASLI_CHORDS = ['Dm', 'A', 'Gm', 'Dm', 'Bb', 'Dm', 'A', 'Dm'];
 
   const SONGS = {
@@ -58,16 +122,7 @@
       lead: { wave: 25, vol: 0.055, a: 0.005, d: 0.08, s: 0.7, r: 0.05, len: 0.9, vib: true },
       harm: { wave: 12, vol: 0.022, a: 0.003, d: 0.05, s: 0.5, r: 0.03, len: 0.6 },
       bass: { type: 'triangle', vol: 0.16, a: 0.005, d: 0.1, s: 0.8, r: 0.04, len: 0.85 },
-      parts: {
-        lead: `
-          A4 - C5 E5 - D5 | C5 - B4 A4 - - | G4 - A4 B4 - C5 | D5 - C5 B4 - - |
-          A4 - C5 E5 - A5 | G5 - F5 E5 - D5 | C5 - B4 G#4 - B4 | A4~ - - - . . |
-          E5 - E5 F5 - E5 | D5 - C5 D5 - - | C5 - C5 D5 - C5 | B4 - A4 B4 - - |
-          A4 - B4 C5 - D5 | E5 - F5 E5 - D5 | C5 - B4 A4 - G#4 | A4~ - - - . .`,
-        harm: fromChords(JOGET_CHORDS, ['.', 'S', 'S', '.', 'S', 'S']),
-        bass: fromChords(JOGET_CHORDS, ['R', '-', '.', 'F', '-', '.']),
-        drum: drums(16, ['D', '.', 'T', 'D', 'T', 't'], [0, 8]),
-      },
+      parts: JOGET_PARTS,
     },
     asli: {
       step: 0.36, // one eighth note, slow 4/4
