@@ -1,4 +1,4 @@
-# Congkak — notes for Claude
+# Congkak: Guli Gila — notes for Claude
 
 Traditional Malaysian congkak as a plain HTML/CSS/JavaScript web game. No build step, no libraries,
 no npm packages. Bahasa Melayu (default) and English. Pixel-art look, chiptune sound, works on phones.
@@ -27,7 +27,7 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
 | `js/rogue.js` | Roguelite run logic. Pure, no DOM. Heroes, marbles (ITEMS), opponents, areas, map generation, shop, rest, events, coins, damage. Runs are plain JSON. |
 | `js/game.js` | All UI: menus, BM/EN text (`I18N`), animation of engine events, sound, roguelite screens, hero portraits, easter egg. |
 | `js/pixel.js` | Canvas board renderer and input (hover, keyboard, targeting, preview rings). |
-| `js/music.js` | Original 8-bit Lagu Asli (menu) and Joget (in play) music. |
+| `js/music.js` | Original 8-bit music: Lagu Asli (menu and map), calm Inang (classic games and normal/elite fights), Joget (roguelite boss fights only). Songs are built from sections (`sections()`); Joget ~54 s, Inang ~56 s per loop. |
 | `style.css` | Styles. Colours are CSS variables at the top; notched 4px pixel borders. |
 
 ## Rules for changes
@@ -75,7 +75,9 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
     `firstLanding` applies the same rule, so the move preview is right for him.
   - Darah Putih (Mahsuri, `finishMatch`): the first time spirit hits 0 she survives with 15, once per run
     (`run.revived`).
-- **Easter egg:** tapping the "g" in the menu title 3 times shows heart rain and
+- **Title:** "Congkak: Guli Gila" (browser tab; the menu logo shows "Congkak" with "Guli Gila" on a
+  second line). Seeds are drawn as glass guli with coloured swirls (`SEED_SPRITE` / `SWIRLS` in pixel.js).
+- **Easter egg:** tapping the "g" in "Congkak" in the menu title 3 times shows heart rain and
   "I love u Hannah my sayang". Keep it hidden (no pointer cursor) and keep it working on phones
   (taps count on `pointerdown`).
 

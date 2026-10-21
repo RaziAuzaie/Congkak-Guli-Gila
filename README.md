@@ -1,4 +1,4 @@
-# Congkak
+# Congkak: Guli Gila
 
 Traditional Malaysian congkak as a plain HTML/JavaScript web game (no build step, no libraries).
 Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit music; works on phones.
@@ -58,7 +58,7 @@ Add `?debug` to the URL to expose a read-only `window.congkakDebug` for automate
 | `js/rogue.js` | Roguelite run logic — no DOM. Heroes, maps, opponents, marbles, coins, shop, rest, events. |
 | `js/game.js` | UI: menus, animation, sounds, roguelite screens, hero and opponent portraits, BM/EN text. |
 | `js/pixel.js` | Pixel-art canvas board renderer and input (hover, keyboard, marble targeting, preview). |
-| `js/music.js` | 8-bit Lagu Asli and Joget music (Web Audio). |
+| `js/music.js` | 8-bit music (Web Audio): Lagu Asli on the menu, a calm Inang in normal matches, Joget in boss fights. |
 | `style.css` | Look & feel (wooden board, modals, map, shop, hero cards). |
 | `test/selfplay.js` | Classic AI-vs-AI sanity test. |
 | `test/rogue.js` | Roguelite run simulation and balance numbers. |

@@ -21,12 +21,18 @@
     ice: '#8fe3ff', iceD: '#3f8fb8', aim: '#ff7eb6', aimD: '#a8457a', land: '#9dff8a',
     shadow: 'rgba(0,0,0,0.45)',
   };
-  const SEED_PAL = [
-    ['#fffbef', '#ecdcb8', '#a8865a'],
-    ['#fff3dc', '#e0c592', '#94703f'],
-    ['#ffffff', '#f2ead8', '#b39a74'],
+  // Seeds are glass guli (Congkak: Guli Gila): clear glass, a darker rim, a white shine
+  // and a two-colour cat's-eye swirl. Sprite digits: 0 glass, 1 glass shade, 2 rim,
+  // 3 swirl colour, 4 second swirl colour, 5 shine.
+  const GLASS = ['#e6eef0', '#b9c9cf', '#5d6e75'];
+  const SWIRLS = [
+    ['#e8402c', '#f2c94a'], // red and yellow
+    ['#3fb83a', '#e8d84a'], // green and yellow
+    ['#2f6fe0', '#f2d23a'], // blue and yellow
+    ['#f2c14e', '#e8612c'], // yellow and orange
   ];
-  const SEED_SPRITE = ['.01.', '0112', '.12.'];
+  const SEED_PAL = SWIRLS.map(([a, b]) => [...GLASS, a, b, '#ffffff']);
+  const SEED_SPRITE = ['.222.', '25032', '20342', '23412', '.222.'];
 
   // 3x5 bitmap digits
   const DIGITS = [
@@ -194,13 +200,15 @@
     const key = (store ? 's' : 'p') + m;
     if (seedCache.has(key)) return seedCache.get(key);
     const list = [];
+    // Spread guli out in a hole so each one reads as a ball; tighter when the hole is full
+    const spread = store ? 1.4 : Math.min(2.6, 10.5 / Math.sqrt(m + 0.5));
     for (let k = 0; k < m; k++) {
-      const r = Math.sqrt(k + 0.5) * (store ? 1.25 : 1.6);
+      const r = Math.sqrt(k + 0.5) * spread;
       const a = k * 2.39996;
       list.push([
         Math.round(Math.cos(a) * r * (store ? 1.05 : 1.1)),
         Math.round(Math.sin(a) * r * (store ? 2.1 : 0.95)),
-        k % 3,
+        k % SWIRLS.length,
       ]);
     }
     list.sort((p, q) => p[1] - q[1]);
@@ -304,8 +312,8 @@
       const cy = r.y + Math.floor(r.h / 2) - (r.store ? 3 : 0);
       for (const [dx, dy, v] of list) {
         const pal = SEED_PAL[v];
-        const sx = cx + dx - 2, sy = cy + dy - 1;
-        for (let row = 0; row < 3; row++) {
+        const sx = cx + dx - 2, sy = cy + dy - 2;
+        for (let row = 0; row < SEED_SPRITE.length; row++) {
           const line = SEED_SPRITE[row];
           for (let col = 0; col < 4; col++) {
             const ch = line[col];

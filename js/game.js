@@ -721,7 +721,10 @@
     if (!settings.music) { Music.stop(); return; }
     const a = ac();
     if (!a) return;
-    Music.play(started && state && state.phase !== 'over' ? 'joget' : 'asli', a);
+    // Menu: Lagu Asli. Boss fights: lively Joget. Every other match (classic too): calm Inang.
+    const inPlay = started && state && state.phase !== 'over';
+    const boss = rogue() && match.m.kind === 'boss';
+    Music.play(!inPlay ? 'asli' : boss ? 'joget' : 'inang', a);
   }
   function tone(freq, start, dur, type = 'triangle', vol = 0.22, endFreq) {
     const a = ac();
@@ -1620,7 +1623,7 @@
         <button type="button" class="btn primary" data-act="new">${inGame ? t('newGame') : t('play')}</button>`;
     }
     openModal(`
-      <h1 class="logo">Con<span class="egg-g">g</span>kak</h1>
+      <h1 class="logo" aria-label="Congkak: Guli Gila"><span aria-hidden="true">Con<span class="egg-g">g</span>kak<span class="logo-sub">Guli Gila</span></span></h1>
       <p class="tagline">${t('tagline')}</p>
       <div class="field"><label>${t('mode')}</label>${seg('mode', [['ai', t('vsAI')], ['pvp', t('pvp')], ['rogue', t('rogue')]])}</div>
       ${settings.mode === 'ai' ? `<div class="field"><label>${t('level')}</label>${seg('level', [['easy', t('easy')], ['medium', t('medium')], ['hard', t('hard')]])}</div>` : ''}

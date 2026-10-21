@@ -1,7 +1,8 @@
 /*
- * 8-bit music engine (Web Audio) with two original pieces in traditional Malay styles:
+ * 8-bit music engine (Web Audio) with three original pieces in traditional Malay styles:
  *   asli  — slow Lagu Asli feel, violin-like cengkok ornaments, rebana + gong (menu)
- *   joget — lively 6/8 Joget, accordion off-beat chords, kompang slaps (gameplay)
+ *   inang — calm, mid-tempo Inang, soft low flute-like tune, light rebana (classic games, normal fights)
+ *   joget — lively 6/8 Joget, accordion off-beat chords, kompang slaps (boss fights)
  *
  * Song notation, one token per step:
  *   A4      note on        A4~ / A4~1   note with a quick upper-neighbour ornament (+2 / +1 semitones)
@@ -30,6 +31,9 @@
     F:  { root: 'F2', fifth: 'C3', stab: 'A3+C4' },
     Bb: { root: 'Bb2', fifth: 'F3', stab: 'Bb3+D4' },
     C:  { root: 'C3', fifth: 'G2', stab: 'E4+G4' },
+    Cm: { root: 'C3', fifth: 'G2', stab: 'Eb4+G4' },
+    D:  { root: 'D3', fifth: 'A2', stab: 'F#4+A4' },
+    Eb: { root: 'Eb3', fifth: 'Bb2', stab: 'Eb4+G4' },
   };
 
   function fromChords(chords, pattern) {
@@ -114,6 +118,35 @@
       drum: ['D', 't', 'T', 'D', 'T', 'T'], fill: JOGET_FILL, gong: [0, 4, 12], quiet: 4,
     },
   ], ['.', 'S', 'S', '.', 'S', 'S'], ['R', '-', '.', 'F', '-', '.']);
+  // Inang: 32 bars of 4/4 eighths (~56 s) in G minor, kept low and unhurried.
+  // A (main tune) → A' (answer) → B (warmer, in the relative major) → A (home)
+  const INANG_BEAT = ['D', '.', '.', 't', 'T', '.', 't', '.'];
+  const INANG_A = {
+    chords: ['Gm', 'Cm', 'Gm', 'D', 'Gm', 'Cm', 'D', 'Gm'],
+    lead: `
+      G4 - - A4 Bb4 - A4 G4 | C5 - - Bb4 A4 - G4 - | Bb4 - A4 G4 D4 - - - | F#4 - G4 A4 - - . . |
+      G4 - - A4 Bb4 - C5 D5 | Eb5 - D5 C5 Bb4 - C5 - | A4 - Bb4 A4 F#4 - A4 - | G4~ - - - - - . .`,
+    drum: INANG_BEAT, gong: [0],
+  };
+  const INANG_PARTS = sections([
+    INANG_A,
+    { // A': the answer phrase
+      chords: ['Gm', 'Cm', 'Gm', 'D', 'Gm', 'Cm', 'D', 'Gm'],
+      lead: `
+        D5 - - C5 Bb4 - A4 G4 | G4 - C5 - Eb5 - D5 C5 | D5 - Bb4 - G4 - - - | A4 - - Bb4 A4 - F#4 - |
+        G4 - Bb4 - D5 - C5 Bb4 | C5 - Eb5 - D5 C5 Bb4 - | A4 - - G4 F#4 - D4 - | G4~ - - - - - . .`,
+      drum: INANG_BEAT, gong: [0],
+    },
+    { // B: warmer, through Eb, Bb and F, turning on D to lead home
+      chords: ['Eb', 'Bb', 'F', 'Bb', 'Eb', 'Bb', 'Cm', 'D'],
+      lead: `
+        Eb4 - G4 Bb4 - - G4 - | F4 - Bb4 D5 - - C5 Bb4 | A4 - - C5 A4 - F4 - | Bb4~ - - - - - . . |
+        G4 - Bb4 - Eb5 - D5 C5 | D5 - - C5 Bb4 - F4 - | G4 - C5 - Eb5 - D5 C5 | A4 - - - F#4 - D4 -`,
+      drum: INANG_BEAT, gong: [0, 4],
+    },
+    INANG_A,
+  ], ['.', '.', 'S', '.', '.', '.', 'S', '.'], ['R', '-', '-', '.', 'F', '-', '-', '.']);
+
   const ASLI_CHORDS = ['Dm', 'A', 'Gm', 'Dm', 'Bb', 'Dm', 'A', 'Dm'];
 
   const SONGS = {
@@ -123,6 +156,13 @@
       harm: { wave: 12, vol: 0.022, a: 0.003, d: 0.05, s: 0.5, r: 0.03, len: 0.6 },
       bass: { type: 'triangle', vol: 0.16, a: 0.005, d: 0.1, s: 0.8, r: 0.04, len: 0.85 },
       parts: JOGET_PARTS,
+    },
+    inang: {
+      step: 0.22, // one eighth note, unhurried 4/4
+      lead: { type: 'triangle', vol: 0.11, a: 0.02, d: 0.15, s: 0.75, r: 0.12, len: 0.92, vib: true },
+      harm: { wave: 50, vol: 0.012, a: 0.02, d: 0.2, s: 0.5, r: 0.15, len: 0.8 },
+      bass: { type: 'triangle', vol: 0.12, a: 0.01, d: 0.2, s: 0.6, r: 0.1, len: 0.85 },
+      parts: INANG_PARTS,
     },
     asli: {
       step: 0.36, // one eighth note, slow 4/4

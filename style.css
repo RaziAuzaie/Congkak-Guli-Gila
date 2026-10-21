@@ -173,6 +173,8 @@ body.rogue .bar-art:not(:empty) { display: flex; align-items: flex-end; margin-r
   margin: 0; text-align: center; font-size: 52px; font-weight: 700; letter-spacing: .02em; line-height: 1;
   color: var(--gold); text-shadow: 4px 4px 0 var(--ink), -0px 4px 0 var(--ink);
 }
+/* Second line of the logo: "Guli Gila" in glass-marble blue */
+.modal h1.logo .logo-sub { display: block; margin-top: 6px; font-size: 30px; letter-spacing: .08em; color: #8fe3ff; }
 .modal .tagline { margin: 10px 0 20px; text-align: center; color: var(--muted); font-size: 15px; }
 .modal h2 { margin: 0 0 14px; font-size: 26px; color: var(--gold); text-align: center; text-wrap: balance; text-shadow: 3px 3px 0 var(--ink); }
 .modal p { line-height: 1.45; }
