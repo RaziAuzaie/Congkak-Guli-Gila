@@ -42,6 +42,8 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
   In a roguelite match the opponent's portrait sits left of the board with the hero below it
   (`renderFighters`); on screens narrower than 1260px small copies show in the name bars instead.
 - Saved data lives in `localStorage`: `congkak.settings` and `congkak.run` (`run.v = 1`).
+  Settings has `musicVol` / `soundVol` (0–100 sliders; `music` / `sound` mean "volume > 0"; old saves
+  with an Off switch load as 0). Slider 70 = the music's original loudness, 80 = the original sound effects.
   If the run format changes, keep old saves loading or bump the version.
 - Check changes in the browser preview, and run both Node tests before committing.
 - Commit messages: short summary line, then a plain-English explanation.

@@ -372,6 +372,11 @@
   root.CongkakMusic = {
     play,
     stop() { M.paused = null; stop(); },
+    /** Music loudness, 0..1 (glides there so dragging a slider doesn't click). */
+    setVolume(v) {
+      M.volume = Math.max(0, Math.min(1, v));
+      if (M.ctx && M.out) M.out.gain.setTargetAtTime(M.volume, M.ctx.currentTime, 0.05);
+    },
     get current() { return M.name; },
     songs: Object.keys(SONGS),
   };

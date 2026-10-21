@@ -203,8 +203,18 @@
   };
 
   // ---------- Settings ----------
-  const DEFAULTS = { lang: 'ms', dir: 'cw', sound: true, music: true, preview: true, level: 'medium', mode: 'ai' };
-  const settings = Object.assign({}, DEFAULTS, loadSettings());
+  // musicVol / soundVol are 0..100 sliders; music / sound stay as "is it on" (volume > 0)
+  const DEFAULTS = { lang: 'ms', dir: 'cw', sound: true, music: true, musicVol: 70, soundVol: 80, preview: true, level: 'medium', mode: 'ai' };
+  const settings = (() => {
+    const saved = loadSettings();
+    const s = Object.assign({}, DEFAULTS, saved);
+    // Saves from before the sliders: an "Off" switch becomes a slider at 0
+    if (saved.musicVol === undefined && saved.music === false) s.musicVol = 0;
+    if (saved.soundVol === undefined && saved.sound === false) s.soundVol = 0;
+    s.music = s.musicVol > 0;
+    s.sound = s.soundVol > 0;
+    return s;
+  })();
   function loadSettings() {
     try { return JSON.parse(localStorage.getItem('congkak.settings')) || {}; } catch (e) { return {}; }
   }
@@ -721,14 +731,19 @@
     if (!settings.music) { Music.stop(); return; }
     const a = ac();
     if (!a) return;
+    Music.setVolume(musicLevel());
     // Menu: Lagu Asli. Boss fights: lively Joget. Every other match (classic too): calm Inang.
     const inPlay = started && state && state.phase !== 'over';
     const boss = rogue() && match.m.kind === 'boss';
     Music.play(!inPlay ? 'asli' : boss ? 'joget' : 'inang', a);
   }
+  // Slider 70 = the music's original loudness; slider 80 = the original sound-effect loudness
+  const musicLevel = () => 0.85 * settings.musicVol / 100;
+  const soundLevel = () => settings.soundVol / 80;
   function tone(freq, start, dur, type = 'triangle', vol = 0.22, endFreq) {
     const a = ac();
     if (!a) return;
+    vol *= soundLevel();
     const t0 = a.currentTime + start;
     const o = a.createOscillator();
     const g = a.createGain();
@@ -1635,13 +1650,21 @@
     screen = 'menu';
   }
 
+  /** A volume slider, 0..100 (0 = off). */
+  function volume(key, label) {
+    const v = settings[key];
+    return `<div class="field vol"><label for="${key}">${label} <b class="vol-num">${v ? v : t('off')}</b></label>
+      <input type="range" id="${key}" class="vol-slider" data-vol="${key}" min="0" max="100" step="5" value="${v}"
+        style="--fill: ${v}%" aria-label="${label}"></div>`;
+  }
+
   function showSettings() {
     openModal(`
       <h2>${t('settings')}</h2>
       <div class="field"><label>${t('language')}</label>${seg('lang', [['ms', 'Bahasa Melayu'], ['en', 'English']])}</div>
       <div class="field"><label>${t('direction')}</label>${seg('dir', [['cw', t('cw')], ['acw', t('acw')]])}</div>
-      <div class="field"><label>${t('sound')}</label>${seg('sound', [['true', t('on')], ['false', t('off')]])}</div>
-      <div class="field"><label>${t('music')}</label>${seg('music', [['true', t('on')], ['false', t('off')]])}</div>
+      ${volume('musicVol', t('music'))}
+      ${volume('soundVol', t('sound'))}
       <div class="field"><label>${t('previewSetting')}</label>${seg('preview', [['true', t('on')], ['false', t('off')]])}</div>
       <div class="actions"><button type="button" class="btn primary" data-act="menu">${t('back')}</button></div>
     `);
@@ -1723,6 +1746,31 @@
   // become clicks (the browser treats them as double-tap zoom).
   modal.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.egg-g')) eggTap();
+  });
+
+  // Volume sliders: apply while dragging, save and play a sample blip when let go
+  modal.addEventListener('input', (e) => {
+    const el = e.target.closest('[data-vol]');
+    if (!el) return;
+    const key = el.dataset.vol;
+    settings[key] = Number(el.value);
+    el.style.setProperty('--fill', el.value + '%');
+    const num = el.closest('.field').querySelector('.vol-num');
+    if (num) num.textContent = settings[key] ? settings[key] : t('off');
+    if (key === 'musicVol') {
+      const wasOn = settings.music;
+      settings.music = settings.musicVol > 0;
+      if (settings.music !== wasOn) updateMusic();
+      else if (window.CongkakMusic) window.CongkakMusic.setVolume(musicLevel());
+    } else {
+      settings.sound = settings.soundVol > 0;
+    }
+  });
+  modal.addEventListener('change', (e) => {
+    const el = e.target.closest('[data-vol]');
+    if (!el) return;
+    saveSettings();
+    if (el.dataset.vol === 'soundVol') sfx('coin');
   });
 
   modal.addEventListener('click', (e) => {

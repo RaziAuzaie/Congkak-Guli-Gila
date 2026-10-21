@@ -173,8 +173,13 @@ body.rogue .bar-art:not(:empty) { display: flex; align-items: flex-end; margin-r
   margin: 0; text-align: center; font-size: 52px; font-weight: 700; letter-spacing: .02em; line-height: 1;
   color: var(--gold); text-shadow: 4px 4px 0 var(--ink), -0px 4px 0 var(--ink);
 }
-/* Second line of the logo: "Guli Gila" in glass-marble blue */
-.modal h1.logo .logo-sub { display: block; margin-top: 6px; font-size: 30px; letter-spacing: .08em; color: #8fe3ff; }
+/* Second line of the logo: "GULI GILA" in the pixel label font, warm cream on a red-orange and ink
+   double shadow, tilted a little for the "crazy" */
+.modal h1.logo .logo-sub {
+  display: block; width: max-content; margin: 12px auto 10px; font-family: var(--font-label); font-size: 24px;
+  font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(--text);
+  text-shadow: 3px 3px 0 var(--red), 5px 5px 0 var(--ink); transform: rotate(-3deg);
+}
 .modal .tagline { margin: 10px 0 20px; text-align: center; color: var(--muted); font-size: 15px; }
 .modal h2 { margin: 0 0 14px; font-size: 26px; color: var(--gold); text-align: center; text-wrap: balance; text-shadow: 3px 3px 0 var(--ink); }
 .modal p { line-height: 1.45; }
@@ -186,6 +191,28 @@ body.rogue .bar-art:not(:empty) { display: flex; align-items: flex-end; margin-r
 .field { margin-bottom: 14px; }
 .field > label { display: block; font-family: var(--font-label); font-size: 11px; color: var(--muted); margin-bottom: 8px; letter-spacing: .08em; }
 .seg { display: flex; gap: 4px; background: var(--ink); padding: 4px; margin-inline: var(--px); }
+/* Volume sliders: a chunky pixel bar with a gold fill and a square gold knob */
+.field.vol label { display: flex; justify-content: space-between; align-items: baseline; }
+.vol-num { font-family: var(--font-display); color: var(--gold); font-size: 15px; }
+.vol-slider {
+  -webkit-appearance: none; appearance: none; display: block; width: calc(100% - 2 * var(--px)); margin: 6px var(--px) 0;
+  height: 28px; background: transparent; cursor: pointer; touch-action: none;
+}
+.vol-slider:focus-visible { outline: 2px dashed var(--gold); outline-offset: 4px; }
+.vol-slider::-webkit-slider-runnable-track {
+  height: 12px; background: linear-gradient(90deg, var(--gold) var(--fill), var(--ink) var(--fill));
+  box-shadow: 0 0 0 3px var(--ink);
+}
+.vol-slider::-moz-range-track { height: 12px; background: var(--ink); box-shadow: 0 0 0 3px var(--ink); }
+.vol-slider::-moz-range-progress { height: 12px; background: var(--gold); }
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 24px; margin-top: -6px; border: 0;
+  background: var(--text); box-shadow: inset -4px -4px 0 var(--muted), 0 0 0 3px var(--ink);
+}
+.vol-slider::-moz-range-thumb {
+  width: 20px; height: 24px; border: 0; border-radius: 0;
+  background: var(--text); box-shadow: inset -4px -4px 0 var(--muted), 0 0 0 3px var(--ink);
+}
 .seg button {
   flex: 1; font-family: var(--font-display); font-size: 15px; color: var(--text);
   background: transparent; border: 0; padding: 7px 4px; cursor: pointer;
