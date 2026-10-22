@@ -87,14 +87,16 @@
       yourTurnRogue: 'Giliran anda — pilih kampung, atau guna guli dahulu',
       hintShown: 'Langkah terbaik bercahaya',
       blocked: 'Perisai menahan tembakan!',
-      timeExtra: 'Guli Masa: main lagi!', boldExtra: '{name} main lagi!',
+      timeExtra: 'Guli Masa: main lagi!',
       goldOn: 'Syiling x2 giliran ini!',
       newRunTitle: 'Mula pengembaraan baru?', newRunText: 'Pengembaraan sekarang akan hilang.',
       giveUp: 'Menyerah', giveUpTitle: 'Menyerah?',
       giveUpText: 'Perlawanan ini dikira kalah. Baki buah di kampung masuk ke rumah lawan, dan anda hilang semangat ikut beza buah.',
       gaveUp: 'Anda menyerah',
       fx_shadow: 'Bayang', fx_lightning: 'Petir', fx_time: 'Masa', fx_shield: 'Perisai', fx_gold: 'Emas',
-      mod_licik: 'Licik', mod_kaya: 'Kaya', mod_berani: 'Berani', mod_sekat: 'Sekatan',
+      mod_licik: 'Licik', mod_kaya: 'Kaya', mod_sekat: 'Sekatan', mod_keris: 'Taming Sari',
+      kerisStab: 'Taming Sari menikam! −{n}', kerisMiss: 'Taming Sari menikam… kosong!',
+      yourTurnKeris: 'Giliran anda — keris akan menikam kampung bertanda bila giliran anda tamat',
       rogueRulesList: [
         'Pengembaraan merentas <b>3 kawasan</b>. Setiap kawasan ialah peta bercabang yang berakhir dengan seorang <b>ketua</b>.',
         'Setiap perlawanan hanya <b>satu pusingan</b>, dan anda mula dahulu. Rumah yang lebih banyak buah menang.',
@@ -181,14 +183,16 @@
       yourTurnRogue: 'Your turn — pick a hole, or use a marble first',
       hintShown: 'The best move is glowing',
       blocked: 'Shield blocks the capture!',
-      timeExtra: 'Time Marble: play again!', boldExtra: '{name} plays again!',
+      timeExtra: 'Time Marble: play again!',
       goldOn: 'Coins x2 this turn!',
       newRunTitle: 'Start a new run?', newRunText: 'Your current run will be lost.',
       giveUp: 'Give up', giveUpTitle: 'Give up?',
       giveUpText: 'This match counts as a loss. Seeds left in the holes go to the opponent’s rumah, and you lose spirit by the seed difference.',
       gaveUp: 'You gave up',
       fx_shadow: 'Shadow', fx_lightning: 'Lightning', fx_time: 'Time', fx_shield: 'Shield', fx_gold: 'Gold',
-      mod_licik: 'Cunning', mod_kaya: 'Rich', mod_berani: 'Bold', mod_sekat: 'Blockade',
+      mod_licik: 'Cunning', mod_kaya: 'Rich', mod_sekat: 'Blockade', mod_keris: 'Taming Sari',
+      kerisStab: 'Taming Sari strikes! −{n}', kerisMiss: 'Taming Sari strikes… empty!',
+      yourTurnKeris: 'Your turn — the keris stabs the marked hole when your turn ends',
       rogueRulesList: [
         'A run crosses <b>3 areas</b>. Each area is a branching map that ends with a <b>boss</b>.',
         'Every match is a <b>single round</b>, and you always move first. The fuller rumah wins.',
@@ -616,6 +620,7 @@
   function renderAll() {
     board.setView(view, state.burnt);
     board.setFrozen(state.fx.frozen);
+    board.setKeris(state.fx.keris);
     renderBars();
   }
 
@@ -698,7 +703,7 @@
   function turnStatus() {
     if (state.phase !== 'play') return '';
     const p = state.player;
-    if (mode === 'rogue') return p === 0 ? t('yourTurnRogue') : t('oppThinking', { name: nameOf(1) });
+    if (mode === 'rogue') return p === 0 ? t(state.fx.keris >= 0 ? 'yourTurnKeris' : 'yourTurnRogue') : t('oppThinking', { name: nameOf(1) });
     if (mode === 'ai') return p === 0 ? t('yourTurn') : t('thinking');
     return t('turnOf', { name: nameOf(p) });
   }
@@ -892,7 +897,7 @@
         case 'extra':
           hideHand();
           flash(C.STORE[who]);
-          toast(ev.why === 'time' ? t('timeExtra') : ev.why === 'bold' ? t('boldExtra', { name: nameOf(who) }) : t('extra'));
+          toast(ev.why === 'time' ? t('timeExtra') : t('extra'));
           sfx('extra');
           comboHit(who, 'extra');
           await sleep(STEP * 5);
@@ -905,6 +910,23 @@
           renderPit(ev.store);
           flash(ev.store);
           await sleep(STEP * 3);
+          break;
+        // Hang Jebat's Taming Sari
+        case 'stab':
+          hideHand();
+          board.stab(); // the keris winds up, then thrusts in about 480 ms later
+          await sleep(480);
+          flash(ev.pos);
+          if (ev.n) {
+            view[ev.pos] = 0;
+            view[ev.store] += ev.n;
+            renderPit(ev.store);
+            flash(ev.store);
+          }
+          toast(ev.n ? t('kerisStab', { n: ev.n }) : t('kerisMiss'));
+          sfx(ev.n ? 'hurt' : 'tok');
+          await sleep(STEP * 4);
+          board.setKeris(ev.next);
           break;
         // hero passives
         case 'steal':

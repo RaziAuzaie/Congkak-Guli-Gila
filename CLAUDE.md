@@ -77,6 +77,14 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
     `firstLanding` applies the same rule, so the move preview is right for him.
   - Darah Putih (Mahsuri, `finishMatch`): the first time spirit hits 0 she survives with 15, once per run
     (`run.revived`).
+- **Opponent modifiers:** Licik (Cunning), Kaya (Rich), Sekatan (Blockade) and Taming Sari (Hang Jebat,
+  boss 2). Bold (extra turn after every capture) was removed at the owner's request on 2026-10-22.
+  Taming Sari (engine, `fx.keris`): a keris floats over one of the player's holes (random at the start);
+  each time the player's turn ends it stabs that hole, every seed there goes to Jebat's rumah, and it
+  moves to the next playable hole. Drawn in pixel.js (`KERIS`, 2x size, see-through "ghost" so the holes
+  under it stay readable; it turns solid, rises and thrusts in when it stabs).
+  Without Bold, runs got much easier (depth 2, no hero: 20% → 66%); Laksamana and Puteri Gunung Ledang
+  still need a replacement modifier to bring the difficulty back.
 - **Title:** "Congkak: Guli Gila" (browser tab; the menu logo shows "Congkak" with "Guli Gila" on a
   second line). Seeds are drawn as glass guli with coloured swirls (`SEED_SPRITE` / `SWIRLS` in pixel.js).
 - **Easter egg:** tapping the "g" in "Congkak" in the menu title 3 times shows heart rain and

@@ -34,6 +34,15 @@
   const SEED_PAL = SWIRLS.map(([a, b]) => [...GLASS, a, b, '#ffffff']);
   const SEED_SPRITE = ['.222.', '25032', '20342', '23412', '.222.'];
 
+  // Hang Jebat's Taming Sari, point down: bird-head hilt leaning left, gold ring and wide guard,
+  // long wavy (luk) steel blade
+  const KERIS = [
+    '.kkk...', 'kgggk..', '.khhk..', '..khk..', '..khk..', '.kgggk.', 'kgggggk',
+    '.kwWWk.', '..kwWWk', '.kwWWk.', 'kwWWk..', '.kwWWk.', '..kwWWk', '.kwWWk.', 'kwWWk..',
+    '.kwWk..', '..kwk..', '..kWk..', '...k...',
+  ];
+  const KERIS_PAL = { k: '#5a0d0d', g: '#f2c14e', h: '#6b3e1e', w: '#c9d3da', W: '#f4f8fb' }; // blood-red outline: Jebat's colour
+
   // 3x5 bitmap digits
   const DIGITS = [
     '111101101101111', '010110010010111', '111001111100111', '111001111001111', '101101111001001',
@@ -252,6 +261,8 @@
       shake: new Map(),
       picked: new Set(),
       frozen: [],      // frozen[i] truthy = draw the ice marker
+      keris: -1,       // hole Hang Jebat's keris floats over (-1 = none)
+      stabAt: 0,       // time the keris last stabbed, for the strike animation
       aiming: false,   // choosing a target for a power marble
       preview: new Map(), // hole -> 'end' | 'store' | 'take', the outcome of the hovered move
     };
@@ -298,6 +309,41 @@
     }
 
     // 5x5 snowflake on a frozen hole
+    /**
+     * The floating keris, drawn big (each sprite pixel = 2x2) and see-through like a spirit, so the
+     * holes under it stay readable. On a stab it goes solid, rises, thrusts into the hole (~480 ms,
+     * when game.js empties the hole), sinks back and fades to a ghost again.
+     */
+    const KERIS_GHOST = 0.45;
+    function drawKeris(t) {
+      if (b.keris < 0) return;
+      const r = rects[b.keris];
+      const since = t - b.stabAt;
+      let off = 0, alpha = KERIS_GHOST;
+      if (since < 300) {                       // wind-up: turns solid and lifts
+        const k = since / 300;
+        alpha = KERIS_GHOST + (1 - KERIS_GHOST) * k;
+        off = -Math.round(4 * k);
+      } else if (since < 480) {                // thrust down into the hole
+        alpha = 1;
+        off = Math.round(-4 + 12 * ((since - 300) / 180));
+      } else if (since < 900) {                // pull back up, still solid
+        alpha = 1;
+        off = Math.round(8 * (1 - (since - 480) / 420));
+      } else if (since < 1200) {               // fade back to a ghost
+        alpha = 1 - (1 - KERIS_GHOST) * ((since - 900) / 300);
+      }
+      const bob = reduceMotion || since < 900 ? 0 : Math.round(Math.sin(t / 650) * 1.5);
+      const S = 2;
+      const tipY = r.y + 14 + bob + off;
+      const x0 = r.cx - Math.floor((KERIS[0].length * S) / 2), y0 = tipY - KERIS.length * S;
+      g.globalAlpha = alpha;
+      KERIS.forEach((row, y) => {
+        for (let x = 0; x < row.length; x++) if (row[x] !== '.') px(x0 + x * S, y0 + y * S, S, S, KERIS_PAL[row[x]]);
+      });
+      g.globalAlpha = 1;
+    }
+
     function drawSnowflake(x, y) {
       px(x + 2, y, 1, 5, P.ice);
       px(x, y + 2, 5, 1, P.ice);
@@ -384,6 +430,8 @@
           badge(b.view[i], r.cx, y, P.text, P.ink, 1, flip);
         }
       }
+
+      drawKeris(t);
 
       // hand chip that follows the sowing
       const hd = b.hand;
@@ -491,6 +539,8 @@
       setPicked(i, on) { if (on) b.picked.add(i); else b.picked.delete(i); },
       clearPicked() { b.picked.clear(); },
       setFrozen(list) { b.frozen = list || []; },
+      setKeris(pos) { b.keris = pos === undefined ? -1 : pos; },
+      stab() { b.stabAt = now(); },
       setAiming(on) { b.aiming = on; },
       setPreview(list) { b.preview = new Map(list || []); },
       /** The hole under the mouse, or the keyboard-focused hole; -1 if none. */

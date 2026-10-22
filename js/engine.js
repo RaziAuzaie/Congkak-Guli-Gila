@@ -16,7 +16,9 @@
  *   shield[p]    p's kampung can't be captured until the opponent's turn ends
  *   time[p]      when p's turn would end, p plays again instead
  *   frozen[i]    hole i can't be picked by its owner for that many turns
- *   bold[p]      p gets an extra turn after every capture (boss rule)
+ *   keris        Hang Jebat's floating Taming Sari: the player hole it hangs over, or -1.
+ *                Each time player 0's turn ends it stabs that hole (all its seeds go to
+ *                player 1's rumah) and moves on to the next playable hole along.
  */
 (function (root) {
   'use strict';
@@ -42,7 +44,8 @@
   function newFx() {
     return {
       shadow: [0, 0], lightning: [0, 0], shield: [0, 0], time: [0, 0],
-      bold: [0, 0], frozen: new Array(SIZE).fill(0),
+      frozen: new Array(SIZE).fill(0),
+      keris: -1,
       // roguelite hero passives: powers[p] = 'tuah' | 'badang' | null;
       // combo[p] = combo hits this turn, steals[p] = keris steals / Badang double drops this turn
       powers: [null, null], combo: [0, 0], steals: [0, 0],
@@ -54,8 +57,8 @@
    *   seeds  starting count per hole (array of SIZE; stores ignored)
    *   store  [p0, p1] seeds already in each rumah
    *   burnt  array of SIZE booleans; burnt holes start empty
-   *   bold   [p0, p1] extra turn after a capture
    *   single true = the game is one round; the round's end is the game's end
+   *   keris  player-0 hole that Hang Jebat's floating keris starts over (roguelite boss), or omit
    *   powers [p0, p1] hero passives: 'tuah' (keris steals) | 'badang' (2 seeds from his hand into his own rumah) | null
    */
   function createGame(first = 0, opts = {}) {
@@ -66,8 +69,8 @@
     const burnt = opts.burnt ? opts.burnt.slice() : new Array(SIZE).fill(false);
     burnt.forEach((b, i) => { if (b) holes[i] = 0; });
     const fx = newFx();
-    if (opts.bold) fx.bold = opts.bold.map((b) => (b ? 1 : 0));
     if (opts.powers) fx.powers = opts.powers.slice();
+    if (opts.keris !== undefined && opts.keris >= 0) fx.keris = opts.keris;
     return {
       holes,
       burnt,
@@ -92,7 +95,7 @@
       single: s.single,
       fx: {
         shadow: f.shadow.slice(), lightning: f.lightning.slice(), shield: f.shield.slice(),
-        time: f.time.slice(), bold: f.bold.slice(), frozen: f.frozen.slice(),
+        time: f.time.slice(), frozen: f.frozen.slice(), keris: f.keris,
         powers: f.powers, combo: f.combo.slice(), steals: f.steals.slice(),
       },
     };
@@ -213,11 +216,6 @@
           st.holes[STORE[p]] += n;
           if (ev) ev.push({ t: 'capture', pos, opp: o, extra, n, store: STORE[p] });
           hit();
-          if (fx.bold[p]) {
-            result = 'extra';
-            if (ev) ev.push({ t: 'extra', why: 'bold' });
-            hit();
-          }
         }
       }
       break;
@@ -236,12 +234,31 @@
       fx.shield[1 - p] = 0;
       fx.combo[p] = 0;
       fx.steals[p] = 0;
+      if (p === 0 && fx.keris >= 0) kerisStab(st, ev);
       for (const i of sidePits(p)) if (fx.frozen[i]) fx.frozen[i]--;
       st.player = 1 - p;
     }
 
     checkEnd(st, ev);
     return { state: st, events: ev, result };
+  }
+
+  /** Taming Sari: stab the hole under the keris (seeds to player 1's rumah), then move one hole along. */
+  function kerisStab(st, ev) {
+    const pos = st.fx.keris;
+    const n = st.burnt[pos] ? 0 : st.holes[pos];
+    if (n > 0) {
+      st.holes[pos] = 0;
+      st.holes[STORE[1]] += n;
+    }
+    const side = sidePits(0);
+    let next = pos;
+    for (let k = 1; k <= side.length; k++) {
+      const c = side[(side.indexOf(pos) + k) % side.length];
+      if (!st.burnt[c]) { next = c; break; }
+    }
+    st.fx.keris = next;
+    if (ev) ev.push({ t: 'stab', pos, n, store: STORE[1], next });
   }
 
   /**

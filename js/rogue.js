@@ -138,7 +138,8 @@
   const MODS = {
     licik: L('Licik: setiap kampungnya bermula dengan 1 buah lebih.', 'Cunning: each of its holes starts with 1 extra seed.'),
     kaya: L('Kaya: rumahnya bermula dengan 10 buah.', 'Rich: its rumah starts with 10 seeds.'),
-    berani: L('Berani: main lagi setiap kali dia menembak.', 'Bold: plays again after every capture.'),
+    keris: L('Taming Sari: keris terapung di atas satu kampung anda. Setiap kali giliran anda tamat, ia menikam kampung itu dan semua buah di situ masuk ke rumah lawan, kemudian ia beralih ke kampung seterusnya.',
+      'Taming Sari: a keris floats over one of your holes. Each time your turn ends it stabs that hole, every seed there goes to the opponent’s rumah, then it moves to your next hole.'),
     sekat: L('Sekatan: kampung anda yang paling dekat dengan rumah bermula hangus.',
       'Blockade: your hole nearest your rumah starts burnt.'),
   };
@@ -155,15 +156,15 @@
     bunian: { name: 'Orang Bunian', title: L('Tak kelihatan', 'The unseen folk') },
     penarik: { name: 'Mat Jenin', title: L('Kaki angan-angan', 'The daydreamer'), mods: ['kaya'] },
     bota: { name: 'Gergasi Bota', title: L('Gergasi rimba', 'Giant of the wilds'), mods: ['licik'] },
-    jebat: { name: 'Hang Jebat', title: L('Pendekar derhaka', 'The rebel warrior'), mods: ['berani'],
+    jebat: { name: 'Hang Jebat', title: L('Pendekar derhaka', 'The rebel warrior'), mods: ['keris'],
       ai: { depth: 3, random: 0.05 } },
 
     pengawal: { name: 'Pengawal Istana', title: L('Tak pernah tidur', 'Never sleeps') },
     bendahara: { name: 'Bendahara', title: L('Bijak berstrategi', 'The grand vizier'), mods: ['sekat'] },
-    laksamana: { name: 'Laksamana', title: L('Panglima laut', 'Admiral of the fleet'), mods: ['berani'] },
+    laksamana: { name: 'Laksamana', title: L('Panglima laut', 'Admiral of the fleet') },
     temenggung: { name: 'Temenggung', title: L('Ketua keselamatan', 'Chief of the guard'), mods: ['kaya', 'licik'] },
     ledang: { name: 'Puteri Gunung Ledang', title: L('Puteri kayangan', 'The mountain princess'),
-      mods: ['berani', 'kaya'], ai: { depth: 4, random: 0 } },
+      mods: ['kaya'], ai: { depth: 4, random: 0 } },
   };
 
   const AREAS = [
@@ -331,13 +332,13 @@
     const ai = e.ai || (node.type === 'match' ? area.ai : area.eliteAi);
     const mods = e.mods || [];
     const opts = {
-      seeds: randomLayout(rnd), store: [0, 0], burnt: new Array(C.SIZE).fill(false), bold: [0, 0], single: true,
+      seeds: randomLayout(rnd), store: [0, 0], burnt: new Array(C.SIZE).fill(false), single: true,
       powers: [run.hero === 'tuah' || run.hero === 'badang' ? run.hero : null, null],
     };
     if (mods.includes('licik')) for (const i of C.sidePits(1)) opts.seeds[i]++;
     if (mods.includes('kaya')) opts.store[1] = 10;
-    if (mods.includes('berani')) opts.bold[1] = 1;
     if (mods.includes('sekat')) opts.burnt[6] = true;
+    if (mods.includes('keris')) opts.keris = pick(C.sidePits(0).filter((i) => !opts.burnt[i]), rnd);
     // The player always opens: in a one-round match the first move decides most
     // games between equal players, so difficulty comes from the opponent instead.
     return { enemy: node.enemy, kind: node.type, ai, mods, opts, first: 0 };
