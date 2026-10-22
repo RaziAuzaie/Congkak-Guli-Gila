@@ -68,6 +68,13 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
 - **Balance targets** (from `test/rogue.js`): strong bot (depth 3) wins ~88% of runs, average (depth 2)
   ~18%, weak (depth 1) ~0% but reaches area 2. Measured 2026-10-18 (200 runs, depth 3 / depth 2):
   no hero 73% / 20%, Tuah 81% / 36%, Mahsuri 90% / 36%, Badang 85% / 30% (2026-10-19, from-hand rule). Heroes should stay roughly level.
+  **2026-10-22:** after Bold was removed, the owner found Hang Jebat too hard in real play and set every
+  opponent's random-move chance by hand (Kampung normals 50%, Belalang 40%, Kancil 35%; Hutan normals 45%,
+  Bota 35%, Jebat 35%; Istana normals 35%, Temenggung 30%, Ledang 27%), then lowered every look-ahead
+  depth by 1 (minimum 1): Kampung 1 / elite 2 / Kancil 1; Hutan 1 / elite 3 / Jebat 2; Istana 2 / elite 4 /
+  Ledang 3. Sim run wins are now far above the old targets (depth 2 player: 100% for every hero; depth 1:
+  no hero 50%, Tuah 98%, Mahsuri 66%, Badang 87%). The owner's own play is the guide now; the sim bots
+  play differently from people.
 - **Hero passives** (on in roguelite only; classic passes no `powers`):
   - Keris Taming Sari (Tuah, engine): every 2nd combo hit in his turn steals 1 seed from the opponent's
     rumah, max 3 per turn. Combo hits = relay pick-ups, captures, extra turns; extra turns keep the combo.

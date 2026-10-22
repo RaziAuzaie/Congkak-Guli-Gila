@@ -150,37 +150,38 @@
     lebai: { name: 'Pak Lebai', title: L('Sabar dan teliti', 'Patient and careful') },
     belalang: { name: 'Pak Belalang', title: L('Tukang tilik', 'The fortune teller'), mods: ['kaya'] },
     kancil: { name: 'Sang Kancil', title: L('Si cerdik hutan', 'The clever mouse-deer'),
-      ai: { depth: 2, random: 0.1 } },
+      ai: { depth: 1, random: 0.35 } },
 
     pawang: { name: 'Tok Pawang', title: L('Penjaga hutan', 'Keeper of the jungle') },
     bunian: { name: 'Orang Bunian', title: L('Tak kelihatan', 'The unseen folk') },
     penarik: { name: 'Mat Jenin', title: L('Kaki angan-angan', 'The daydreamer'), mods: ['kaya'] },
     bota: { name: 'Gergasi Bota', title: L('Gergasi rimba', 'Giant of the wilds'), mods: ['licik'] },
     jebat: { name: 'Hang Jebat', title: L('Pendekar derhaka', 'The rebel warrior'), mods: ['keris'],
-      ai: { depth: 3, random: 0.05 } },
+      ai: { depth: 2, random: 0.35 } },
 
     pengawal: { name: 'Pengawal Istana', title: L('Tak pernah tidur', 'Never sleeps') },
     bendahara: { name: 'Bendahara', title: L('Bijak berstrategi', 'The grand vizier'), mods: ['sekat'] },
     laksamana: { name: 'Laksamana', title: L('Panglima laut', 'Admiral of the fleet') },
     temenggung: { name: 'Temenggung', title: L('Ketua keselamatan', 'Chief of the guard'), mods: ['kaya', 'licik'] },
     ledang: { name: 'Puteri Gunung Ledang', title: L('Puteri kayangan', 'The mountain princess'),
-      mods: ['kaya'], ai: { depth: 4, random: 0 } },
+      mods: ['kaya'], ai: { depth: 3, random: 0.27 } },
   };
 
+  // random = chance the opponent plays a random move instead of its best one (owner-tuned 2026-10-22)
   const AREAS = [
     {
       name: L('Kampung', 'The Village'),
-      ai: { depth: 1, random: 0.45 }, eliteAi: { depth: 3, random: 0.1 },
+      ai: { depth: 1, random: 0.5 }, eliteAi: { depth: 2, random: 0.4 },
       pool: ['budak', 'makcik', 'lebai'], elites: ['belalang'], boss: 'kancil',
     },
     {
       name: L('Hutan Rimba', 'The Jungle'),
-      ai: { depth: 2, random: 0.2 }, eliteAi: { depth: 4, random: 0.05 },
+      ai: { depth: 1, random: 0.45 }, eliteAi: { depth: 3, random: 0.35 },
       pool: ['pawang', 'bunian', 'penarik'], elites: ['bota'], boss: 'jebat',
     },
     {
       name: L('Istana', 'The Palace'),
-      ai: { depth: 3, random: 0.1 }, eliteAi: { depth: 5, random: 0 },
+      ai: { depth: 2, random: 0.35 }, eliteAi: { depth: 4, random: 0.3 },
       pool: ['pengawal', 'bendahara', 'laksamana'], elites: ['temenggung'], boss: 'ledang',
     },
   ];
