@@ -78,14 +78,21 @@ The owner is new to coding and to Git: explain git steps plainly, and give one c
 - **Hero passives** (on in roguelite only; classic passes no `powers`):
   - Keris Taming Sari (Tuah, engine): every 2nd combo hit in his turn steals 1 seed from the opponent's
     rumah, max 3 per turn. Combo hits = relay pick-ups, captures, extra turns; extra turns keep the combo.
-  - Kekuatan Badang (engine): when his sowing passes his own rumah he drops 2 seeds there, the 2nd taken
-    from his hand (no new seeds; the owner asked for this). Max 3 per turn; uncapped he won 100% of
-    strong sim runs. If the 2nd seed is his last, the sowing ends in his rumah = extra turn.
-    `firstLanding` applies the same rule, so the move preview is right for him.
+  - Batu Badang (replaced Kekuatan Badang on 2026-10-23 at the owner's request): once per match, on his
+    turn before sowing, the player taps the Batu Badang card in the tray, then an enemy hole. A rock
+    (`fx.rock`, `C.throwRock`) sits there for the enemy's next 2 turns: the enemy can't pick that hole,
+    everyone's sowing skips it (Badang's too, the owner asked for this), nobody can capture from it and
+    marbles can't target it (`nextPos` / `legalMoves` / capture / `itemTargets`, so the AI and
+    `firstLanding` know; the preview treats it as uncapturable). Drawn in pixel.js (`ROCK`, falls in with a bounce, gold pips
+    = turns left). Sim (depth 1 player): ~50% of runs, about the no-hero level; the sim bot only throws
+    it on turn 1 at the fullest hole.
   - Darah Putih (Mahsuri, `finishMatch`): the first time spirit hits 0 she survives with 15, once per run
     (`run.revived`).
-- **Opponent modifiers:** Licik (Cunning), Kaya (Rich), Sekatan (Blockade) and Taming Sari (Hang Jebat,
-  boss 2). Bold (extra turn after every capture) was removed at the owner's request on 2026-10-22.
+- **Opponent modifiers:** Licik (Cunning), Kaya (Rich), Sekatan (Blockade), Main Tipu (Pak Belalang,
+  area-1 elite, with Rich) and Taming Sari (Hang Jebat, boss 2).
+  Main Tipu (engine, `fx.tipu`): every seed he drops into his own rumah brings 1–2 extra seeds from
+  nowhere; his hand doesn't go down for them. The amount is 1 + (his rumah count % 2), so it looks random
+  but the AI search stays repeatable. About +21 seeds per match in tests; whole-run sim numbers barely moved. Bold (extra turn after every capture) was removed at the owner's request on 2026-10-22.
   Taming Sari (engine, `fx.keris`): a keris floats over one of the player's holes (random at the start);
   each time the player's turn ends it stabs that hole, every seed there goes to Jebat's rumah, and it
   moves to the next playable hole. Drawn in pixel.js (`KERIS`, 2x size, see-through "ghost" so the holes

@@ -304,6 +304,9 @@ body.rogue .bar-art:not(:empty) { display: flex; align-items: flex-end; margin-r
 .slot.card { font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 6px; color: var(--text); }
 .slot-name { font-size: 12px; font-weight: 700; color: var(--gold); line-height: 1.15; text-align: center; }
 .slot-desc { font-size: 12px; line-height: 1.2; text-align: center; }
+/* Badang's rock card: greyed out once thrown */
+.slot.card.rock .rock-icon { width: 30px; height: auto; }
+.slot.card.used { opacity: .45; cursor: default; filter: grayscale(.5); }
 .slot.giveup { margin-left: 18px; align-self: center; background: #3a170e; color: #ffcbb8; }
 .slot.giveup:hover { background: #5a2416; }
 .slot.giveup .pxi { width: 20px; height: 20px; }

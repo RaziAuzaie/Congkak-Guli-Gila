@@ -101,8 +101,8 @@
   };
 
   // ---------- heroes (chosen at the start of a run) ----------
-  // Passives are active: Tuah and Badang in the engine (opts.powers, also in the move preview),
-  // Mahsuri's revive in finishMatch.
+  // Passives are active: Tuah in the engine (opts.powers), Mahsuri's revive in finishMatch,
+  // Badang's rock is thrown from the match tray (C.throwRock, targets from rockTargets).
   // Stats and Mahsuri's second power are display-only for now.
   const REVIVE_HP = 15; // Darah Putih
 
@@ -127,8 +127,8 @@
     badang: {
       name: 'Badang',
       style: L('Kekuatan mentah', 'Raw power'),
-      passive: L('Kekuatan Badang: setiap kali taburan anda melalui rumah anda, jatuhkan 2 buah dari tangan dan bukan 1 (maks 3 setiap giliran).',
-        'Kekuatan Badang: each time your sowing passes your rumah, drop 2 seeds from your hand there instead of 1 (max 3 per turn).'),
+      passive: L('Batu Badang: sekali setiap perlawanan, baling batu besar ke satu kampung lawan. Selama 2 giliran lawan tak boleh memilihnya, dan tiada sesiapa boleh menabur ke dalamnya atau menembaknya.',
+        'Batu Badang: once per match, throw a huge rock onto one enemy hole. For 2 turns the enemy can’t pick it, and nobody can sow into it or capture from it.'),
       second: null,
       stats: { hp: 50, coins: 10, slots: 2, items: 1 },
     },
@@ -138,6 +138,8 @@
   const MODS = {
     licik: L('Licik: setiap kampungnya bermula dengan 1 buah lebih.', 'Cunning: each of its holes starts with 1 extra seed.'),
     kaya: L('Kaya: rumahnya bermula dengan 10 buah.', 'Rich: its rumah starts with 10 seeds.'),
+    tipu: L('Main Tipu: setiap kali dia menabur ke rumahnya, dia menyelit 1–2 buah tambahan entah dari mana.',
+      'Play Dirty: every time he sows into his rumah, he sneaks in 1–2 extra seeds from nowhere.'),
     keris: L('Taming Sari: keris terapung di atas satu kampung anda. Setiap kali giliran anda tamat, ia menikam kampung itu dan semua buah di situ masuk ke rumah lawan, kemudian ia beralih ke kampung seterusnya.',
       'Taming Sari: a keris floats over one of your holes. Each time your turn ends it stabs that hole, every seed there goes to the opponent’s rumah, then it moves to your next hole.'),
     sekat: L('Sekatan: kampung anda yang paling dekat dengan rumah bermula hangus.',
@@ -148,7 +150,7 @@
     budak: { name: 'Budak Kampung', title: L('Baru belajar', 'Just learning') },
     makcik: { name: 'Mak Cik Kedai', title: L('Tak suka kalah', 'Hates losing') },
     lebai: { name: 'Pak Lebai', title: L('Sabar dan teliti', 'Patient and careful') },
-    belalang: { name: 'Pak Belalang', title: L('Tukang tilik', 'The fortune teller'), mods: ['kaya'] },
+    belalang: { name: 'Pak Belalang', title: L('Tukang tilik', 'The fortune teller'), mods: ['kaya', 'tipu'] },
     kancil: { name: 'Sang Kancil', title: L('Si cerdik hutan', 'The clever mouse-deer'),
       ai: { depth: 1, random: 0.35 } },
 
@@ -334,11 +336,12 @@
     const mods = e.mods || [];
     const opts = {
       seeds: randomLayout(rnd), store: [0, 0], burnt: new Array(C.SIZE).fill(false), single: true,
-      powers: [run.hero === 'tuah' || run.hero === 'badang' ? run.hero : null, null],
+      powers: [run.hero === 'tuah' ? 'tuah' : null, null],
     };
     if (mods.includes('licik')) for (const i of C.sidePits(1)) opts.seeds[i]++;
     if (mods.includes('kaya')) opts.store[1] = 10;
     if (mods.includes('sekat')) opts.burnt[6] = true;
+    if (mods.includes('tipu')) opts.tipu = [0, 1];
     if (mods.includes('keris')) opts.keris = pick(C.sidePits(0).filter((i) => !opts.burnt[i]), rnd);
     // The player always opens: in a one-round match the first move decides most
     // games between equal players, so difficulty comes from the opponent instead.
@@ -410,7 +413,8 @@
   function itemTargets(state, p, id) {
     const def = ITEMS[id];
     if (!def.target) return [];
-    const side = C.sidePits(def.target === 'own' ? p : 1 - p).filter((i) => !state.burnt[i]);
+    // a hole under Badang's rock can't be touched by marbles either
+    const side = C.sidePits(def.target === 'own' ? p : 1 - p).filter((i) => !state.burnt[i] && i !== state.fx.rock);
     if (id === 'tanah') return side;
     if (id === 'ais') return side.filter((i) => state.holes[i] > 0 && !state.fx.frozen[i]);
     return side.filter((i) => state.holes[i] > 0);
@@ -440,7 +444,7 @@
         break;
       case 'ribut':
         for (const i of C.sidePits(1 - p)) {
-          if (!st.burnt[i] && st.holes[i] > 0) {
+          if (!st.burnt[i] && i !== st.fx.rock && st.holes[i] > 0) {
             st.holes[i]--;
             st.holes[store]++;
             ev.push({ t: 'move', from: i, to: store, n: 1 });
@@ -455,6 +459,11 @@
     }
     C.checkEnd(st, ev);
     return { state: st, events: ev };
+  }
+
+  /** Enemy holes Badang's rock can land on: any of player 1's holes that isn't burnt. */
+  function rockTargets(state) {
+    return C.sidePits(1).filter((i) => !state.burnt[i]);
   }
 
   // ---------- shop, rest, events ----------
@@ -574,7 +583,7 @@
   const api = {
     START, MAX_SLOTS, REVIVE_HP, ROWS, COLS, ITEMS, HEROES, MODS, ENEMIES, AREAS, REST, EVENTS,
     newRun, nextArea, genMap, available, visit, nodeById,
-    makeMatch, finishMatch, hitValue, damageFor, itemTargets, useItem,
+    makeMatch, finishMatch, hitValue, damageFor, itemTargets, useItem, rockTargets,
     makeShop, buy, randomEvent, randomItem, addItem, hasSlot, heal, earn,
   };
   root.CongkakRogue = api;

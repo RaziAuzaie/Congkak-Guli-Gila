@@ -76,7 +76,9 @@
       leave: 'Keluar',
       chooseHero: 'Pilih wira anda', pick: 'Pilih', lbl_passive: 'Pasif', lbl_second: 'Kuasa kedua',
       lbl_bag: 'Beg', heroSoon: 'Kuasa pasif sudah aktif. Statistik wira dan kuasa kedua akan datang.',
-      kerisSteal: 'Keris Taming Sari! Curi 1 buah', badangBonus: 'Kekuatan Badang! 2 buah ke rumah',
+      kerisSteal: 'Keris Taming Sari! Curi 1 buah', rockName: 'Batu Badang', rockShort: 'Sekat 1 kampung lawan (2 giliran)', rockUsed: 'Sudah dibaling',
+      rockAim: 'Pilih kampung lawan untuk dibaling batu. Ketik Batal untuk berhenti.', rockHit: 'Batu Badang! Kampung disekat',
+      rockGone: 'Batu terangkat',
       revived: 'Darah Putih! Mahsuri bangkit semula', revivedNote: 'Darah Putih menyelamatkan anda. Ia hanya sekali setiap pengembaraan.',
       restTitle: 'Wakaf', restText: 'Sebuah wakaf di tepi jalan. Pilih satu.',
       combo: 'KOMBO x{n}',
@@ -94,7 +96,7 @@
       giveUpText: 'Perlawanan ini dikira kalah. Baki buah di kampung masuk ke rumah lawan, dan anda hilang semangat ikut beza buah.',
       gaveUp: 'Anda menyerah',
       fx_shadow: 'Bayang', fx_lightning: 'Petir', fx_time: 'Masa', fx_shield: 'Perisai', fx_gold: 'Emas',
-      mod_licik: 'Licik', mod_kaya: 'Kaya', mod_sekat: 'Sekatan', mod_keris: 'Taming Sari',
+      mod_licik: 'Licik', mod_kaya: 'Kaya', mod_sekat: 'Sekatan', mod_keris: 'Taming Sari', mod_tipu: 'Main Tipu', cheat: 'Main tipu! +{n}',
       kerisStab: 'Taming Sari menikam! −{n}', kerisMiss: 'Taming Sari menikam… kosong!',
       yourTurnKeris: 'Giliran anda — keris akan menikam kampung bertanda bila giliran anda tamat',
       rogueRulesList: [
@@ -172,7 +174,9 @@
       leave: 'Leave',
       chooseHero: 'Choose your hero', pick: 'Choose', lbl_passive: 'Passive', lbl_second: 'Second power',
       lbl_bag: 'Bag', heroSoon: 'Passive powers are active. Hero stats and second powers are coming soon.',
-      kerisSteal: 'Keris Taming Sari! Stole 1 seed', badangBonus: 'Kekuatan Badang! 2 seeds in the rumah',
+      kerisSteal: 'Keris Taming Sari! Stole 1 seed', rockName: 'Batu Badang', rockShort: 'Block 1 enemy hole (2 turns)', rockUsed: 'Thrown',
+      rockAim: 'Choose an enemy hole for the rock. Tap Cancel to stop.', rockHit: 'Batu Badang! Hole blocked',
+      rockGone: 'The rock lifts',
       revived: 'Darah Putih! Mahsuri rises again', revivedNote: 'Darah Putih saved you. It works only once per run.',
       restTitle: 'Rest Stop', restText: 'A roadside shelter. Choose one.',
       combo: 'COMBO x{n}',
@@ -190,7 +194,7 @@
       giveUpText: 'This match counts as a loss. Seeds left in the holes go to the opponent’s rumah, and you lose spirit by the seed difference.',
       gaveUp: 'You gave up',
       fx_shadow: 'Shadow', fx_lightning: 'Lightning', fx_time: 'Time', fx_shield: 'Shield', fx_gold: 'Gold',
-      mod_licik: 'Cunning', mod_kaya: 'Rich', mod_sekat: 'Blockade', mod_keris: 'Taming Sari',
+      mod_licik: 'Cunning', mod_kaya: 'Rich', mod_sekat: 'Blockade', mod_keris: 'Taming Sari', mod_tipu: 'Play Dirty', cheat: 'Cheating! +{n}',
       kerisStab: 'Taming Sari strikes! −{n}', kerisMiss: 'Taming Sari strikes… empty!',
       yourTurnKeris: 'Your turn — the keris stabs the marked hole when your turn ends',
       rogueRulesList: [
@@ -610,6 +614,7 @@
     return `<svg class="${cls || (anim && idle.fade ? 'hero-art fade' : 'hero-art')}"${size} viewBox="0 0 ${w} ${grid.length}" shape-rendering="crispEdges" aria-hidden="true">${body}</svg>`;
   }
   const marble = (id) => pxSvg(MARBLE, R.ITEMS[id].color, 'marble');
+  const rockIcon = () => artSvg(window.PixelBoard.ROCK, 'marble rock-icon');
 
   // ---------- Board ----------
   // The pixel renderer draws `view` every frame; we only need to hand it new arrays.
@@ -621,6 +626,7 @@
     board.setView(view, state.burnt);
     board.setFrozen(state.fx.frozen);
     board.setKeris(state.fx.keris);
+    board.setRock(state.fx.rock, state.fx.rockTurns);
     renderBars();
   }
 
@@ -803,8 +809,9 @@
 
   async function onPit(i, touch = false) {
     if (aiming) {
-      if (aiming.targets.includes(i)) await applyItem(aiming.slot, i);
-      else board.shake(i);
+      if (!aiming.targets.includes(i)) board.shake(i);
+      else if (aiming.slot === 'rock') await throwRock(i);
+      else await applyItem(aiming.slot, i);
       return;
     }
     if (busy || !state || state.phase !== 'play' || !isHuman(state.player)) return;
@@ -911,6 +918,15 @@
           flash(ev.store);
           await sleep(STEP * 3);
           break;
+        // Pak Belalang's Main Tipu: extra seeds appear in his rumah
+        case 'cheat':
+          view[ev.pos] += ev.n;
+          renderPit(ev.pos);
+          flash(ev.pos);
+          toast(t('cheat', { n: ev.n }));
+          sfx('magic');
+          await sleep(STEP * 3);
+          break;
         // Hang Jebat's Taming Sari
         case 'stab':
           hideHand();
@@ -940,14 +956,18 @@
           sfx('magic');
           await sleep(STEP * 4);
           break;
-        case 'bonus': // Badang's 2nd seed in his rumah, from his hand
-          view[ev.pos]++;
-          hand = ev.hand;
-          renderPit(ev.pos);
-          showHand(ev.pos, hand);
-          flash(ev.pos);
-          toast(t('badangBonus'));
-          sfx('coin');
+        case 'rock': // Batu Badang lands on an enemy hole
+          board.setRock(ev.pos, 2);
+          board.dropRock();
+          await sleep(260);
+          board.shake(ev.pos);
+          sfx('hurt');
+          toast(t('rockHit'));
+          await sleep(STEP * 4);
+          break;
+        case 'rockGone':
+          board.setRock(-1);
+          toast(t('rockGone'));
           await sleep(STEP * 2);
           break;
         // power-marble effects
@@ -1084,6 +1104,12 @@
     const tray = $('#tray');
     if (!rogue()) { tray.innerHTML = ''; return; }
     let html = '<div class="slots">';
+    if (run.hero === 'badang') {
+      const used = match.rockUsed;
+      const cls = (aiming && aiming.slot === 'rock' ? ' aim' : '') + (used ? ' used' : '');
+      html += `<button type="button" class="slot card rock${cls}" data-tray="rock" ${used ? 'disabled' : ''} aria-label="${t('rockName')}">${rockIcon()}` +
+        `<span class="slot-name">${t('rockName')}</span><span class="slot-desc">${used ? t('rockUsed') : t('rockShort')}</span></button>`;
+    }
     for (let k = 0; k < run.slots; k++) {
       const id = run.items[k];
       if (!id) { html += `<div class="slot empty" aria-label="${t('emptySlot')}"></div>`; continue; }
@@ -1097,7 +1123,13 @@
     }
     html += '</div>';
     const id = run.items[selSlot];
-    if (aiming) {
+    if (aiming && aiming.slot === 'rock') {
+      html += `<div class="item-info">
+        <div class="item-name">${rockIcon()}<b>${t('rockName')}</b></div>
+        <p>${t('rockAim')}</p>
+        <div class="item-actions"><button type="button" class="btn ghost small" data-tray="cancel">${t('cancel')}</button></div>
+      </div>`;
+    } else if (aiming) {
       html += `<div class="item-info">
         <div class="item-name">${marble(aiming.id)}<b>${esc(tx(R.ITEMS[aiming.id].name))}</b></div>
         <p>${t('aimHint', { name: esc(tx(R.ITEMS[aiming.id].name)) })}</p>
@@ -1136,6 +1168,9 @@
       startUse(selSlot);
     } else if (b.dataset.tray === 'giveup') {
       confirmGiveUp();
+    } else if (b.dataset.tray === 'rock') {
+      if (aiming && aiming.slot === 'rock') { cancelAim(); return; }
+      startRock();
     }
   });
 
@@ -1204,6 +1239,34 @@
       return;
     }
     applyItem(slot, null);
+  }
+
+  // ---------- Badang: Batu Badang (once per match) ----------
+  function startRock() {
+    if (match.rockUsed) return;
+    if (!canUseItems()) { setStatus(t('notYourTurn')); return; }
+    if (aiming) cancelAim();
+    clearPreview();
+    selSlot = -1;
+    aiming = { slot: 'rock', id: 'rock', targets: R.rockTargets(state) };
+    updateUI();
+    setStatus(t('rockAim'));
+  }
+
+  async function throwRock(target) {
+    const g = gen;
+    match.rockUsed = true;
+    aiming = null;
+    busy = true;
+    updateUI();
+    const res = C.throwRock(state, target);
+    await animate(res.events, g, 0);
+    if (g !== gen) return;
+    state = res.state;
+    busy = false;
+    renderAll();
+    updateUI();
+    setStatus(turnStatus());
   }
 
   async function applyItem(slot, target) {

@@ -34,9 +34,15 @@ function playMatch(run, node, rnd) {
   const m = R.makeMatch(run, node, rnd);
   let s = C.createGame(m.first, m.opts);
   let combo = 0, comboCoins = 0, guard = 0;
+  let rockUsed = run.hero !== 'badang'; // Badang throws his rock once, on the enemy's fullest hole
   while (s.phase === 'play') {
     if (++guard > 3000) { fail('match did not finish'); break; }
     if (s.player === 0) {
+      if (!rockUsed) {
+        const tg = R.rockTargets(s).sort((a, b) => s.holes[b] - s.holes[a])[0];
+        if (tg !== undefined) s = C.throwRock(s, tg).state;
+        rockUsed = true;
+      }
       // sometimes use a marble before moving
       if (run.items.length && rnd() < 0.35) {
         const id = run.items[0];

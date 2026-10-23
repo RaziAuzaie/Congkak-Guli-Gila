@@ -15,7 +15,7 @@ Bahasa Melayu and English. Pixel-art board, chiptune sound and original 8-bit mu
   coins buy one-use power marbles (guli sakti). Losing costs spirit (semangat); run out and the run ends.
   The run saves automatically whenever the map is shown.
   Each hero has an active passive power: Hang Tuah's keris steals seeds on combos, Mahsuri survives
-  her first defeat that would end the run, and Badang drops 2 seeds from his hand each time he passes his rumah. Hero stats and
+  her first defeat that would end the run, and Badang throws a rock once per match that seals an enemy hole for 2 turns (nobody can sow into it or capture from it). Hero stats and
   Mahsuri's second power are not active yet.
   Every opponent has an animated pixel portrait, shown left of the board during its match with your hero below it.
 

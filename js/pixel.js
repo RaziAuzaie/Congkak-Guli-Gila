@@ -43,6 +43,35 @@
   ];
   const KERIS_PAL = { k: '#5a0d0d', g: '#f2c14e', h: '#6b3e1e', w: '#c9d3da', W: '#f4f8fb' }; // blood-red outline: Jebat's colour
 
+  // Badang's rock: a boulder just bigger than a hole (26x24), lit from the top left, with cracks and moss
+  const ROCK = [
+    '..........kkkkkk..........',
+    '........kkmLmmLmkk........',
+    '......kkmmLLoLLLomk.......',
+    '.....kLmLLLLoLLooookk.....',
+    '....kLLLLLLooLooooook.....',
+    '...kLLLLLLoooooooooook....',
+    '..kLLLLLLoooooocooooOok...',
+    '..kLLLLLLoooooocoooOOook..',
+    '.kLLooLLoooooocoooOOOoOOk.',
+    '.kLooLcooooooocoooOOOOOOk.',
+    '.kLooLocooooooocoOOOOOOOOk',
+    '.koooooooooooooocOOOOOOOOk',
+    '.kooooooooooOooOccOOOOOOOk',
+    '.koooooooooOOooOOOOOODOOOk',
+    '.kooooooocOOOoOOOOOODDOODk',
+    '.koooooooOcOOOOOOOODDDODDk',
+    '.koooooooOcOOOOOOOODDDDDk.',
+    '.kooooooOOOccOOOOODDDDDDk.',
+    '..koOooOOOOOOOOOODDDDDDk..',
+    '..kOOoOOOOOOODOODDDDDDk...',
+    '...kOoOOOOOODDOODDDDDk....',
+    '...kkOOOOOODDDODDDDDk.....',
+    '.....kkkOOODDDDDDDkk......',
+    '........kkkkkkkkkk........',
+  ];
+  const ROCK_PAL = { k: '#1f1a17', L: '#c4c0b6', o: '#9a958b', O: '#6b665d', D: '#4a463f', c: '#2e2a26', m: '#6f9a3c' };
+
   // 3x5 bitmap digits
   const DIGITS = [
     '111101101101111', '010110010010111', '111001111100111', '111001111001111', '101101111001001',
@@ -262,6 +291,9 @@
       picked: new Set(),
       frozen: [],      // frozen[i] truthy = draw the ice marker
       keris: -1,       // hole Hang Jebat's keris floats over (-1 = none)
+      rock: -1,        // hole under Badang's rock (-1 = none)
+      rockTurns: 0,    // turns the rock has left (drawn as pips)
+      rockAt: 0,       // time the rock was thrown, for the fall
       stabAt: 0,       // time the keris last stabbed, for the strike animation
       aiming: false,   // choosing a target for a power marble
       preview: new Map(), // hole -> 'end' | 'store' | 'take', the outcome of the hovered move
@@ -344,6 +376,23 @@
       g.globalAlpha = 1;
     }
 
+    /** Badang's rock: falls into the hole with a little bounce, then sits there with turns-left pips. */
+    function drawRock(t) {
+      if (b.rock < 0) return;
+      const r = rects[b.rock];
+      const since = t - b.rockAt;
+      let drop = 0;
+      if (since < 260) drop = -Math.round(44 * Math.pow(1 - since / 260, 2));       // falling
+      else if (since < 420) drop = -Math.round(3 * Math.sin(((since - 260) / 160) * Math.PI)); // bounce
+      // covers the whole hole and its rim; the count badge is drawn on top of it
+      const x0 = r.cx - 13, y0 = r.y + Math.floor((r.h - ROCK.length) / 2) + drop;
+      if (since >= 260) px(r.cx - 11, y0 + ROCK.length, 22, 1, P.shadow);
+      ROCK.forEach((row, y) => {
+        for (let x = 0; x < row.length; x++) if (row[x] !== '.') px(x0 + x, y0 + y, 1, 1, ROCK_PAL[row[x]]);
+      });
+      for (let k = 0; k < b.rockTurns; k++) px(r.cx - 3 + k * 4, y0 + ROCK.length - 5, 2, 2, P.gold);
+    }
+
     function drawSnowflake(x, y) {
       px(x + 2, y, 1, 5, P.ice);
       px(x, y + 2, 5, 1, P.ice);
@@ -416,6 +465,8 @@
         if (!b.burnt[i]) drawSeeds(i, r, ox);
         if (b.frozen[i]) drawSnowflake(r.x + r.w - 6, r.y + 1);
       }
+
+      drawRock(t); // before the counts, so a blocked hole still shows its number
 
       // counts
       for (let i = 0; i < C.SIZE; i++) {
@@ -540,6 +591,8 @@
       clearPicked() { b.picked.clear(); },
       setFrozen(list) { b.frozen = list || []; },
       setKeris(pos) { b.keris = pos === undefined ? -1 : pos; },
+      setRock(pos, turns) { b.rock = pos === undefined ? -1 : pos; b.rockTurns = turns || 0; },
+      dropRock() { b.rockAt = now(); },
       stab() { b.stabAt = now(); },
       setAiming(on) { b.aiming = on; },
       setPreview(list) { b.preview = new Map(list || []); },
@@ -549,5 +602,5 @@
     };
   }
 
-  root.PixelBoard = { create: createPixelBoard };
+  root.PixelBoard = { create: createPixelBoard, ROCK: { grid: ROCK, pal: ROCK_PAL } };
 })(window);

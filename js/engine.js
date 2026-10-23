@@ -16,6 +16,11 @@
  *   shield[p]    p's kampung can't be captured until the opponent's turn ends
  *   time[p]      when p's turn would end, p plays again instead
  *   frozen[i]    hole i can't be picked by its owner for that many turns
+ *   tipu[p]      Pak Belalang's Main Tipu: each seed p drops in p's own rumah brings 1-2 extra
+ *                seeds from nowhere (1 + rumah count % 2, so the AI search stays repeatable)
+ *   rock         Badang's thrown rock: the hole it sits on, or -1. Its owner can't pick it, everyone's
+ *                sowing skips it and nobody can capture from it; it lifts after rockTurns of the
+ *                owner's turns (throwRock)
  *   keris        Hang Jebat's floating Taming Sari: the player hole it hangs over, or -1.
  *                Each time player 0's turn ends it stabs that hole (all its seeds go to
  *                player 1's rumah) and moves on to the next playable hole along.
@@ -29,7 +34,6 @@
   const SIZE = 16;
   const MAX_STEPS = 5000;  // guard against pathological relay loops
   const KERIS_MAX = 3;     // Hang Tuah: steals per turn
-  const BADANG_MAX = 3;    // Badang: double drops in his rumah per turn
 
   function sidePits(p) {
     const base = p === 0 ? 0 : 8;
@@ -45,8 +49,10 @@
     return {
       shadow: [0, 0], lightning: [0, 0], shield: [0, 0], time: [0, 0],
       frozen: new Array(SIZE).fill(0),
+      tipu: [0, 0],
+      rock: -1, rockTurns: 0,
       keris: -1,
-      // roguelite hero passives: powers[p] = 'tuah' | 'badang' | null;
+      // roguelite hero passives: powers[p] = 'tuah' | null;
       // combo[p] = combo hits this turn, steals[p] = keris steals / Badang double drops this turn
       powers: [null, null], combo: [0, 0], steals: [0, 0],
     };
@@ -58,8 +64,9 @@
    *   store  [p0, p1] seeds already in each rumah
    *   burnt  array of SIZE booleans; burnt holes start empty
    *   single true = the game is one round; the round's end is the game's end
+   *   tipu   [p0, p1] Main Tipu: extra seeds whenever that player sows into their own rumah
    *   keris  player-0 hole that Hang Jebat's floating keris starts over (roguelite boss), or omit
-   *   powers [p0, p1] hero passives: 'tuah' (keris steals) | 'badang' (2 seeds from his hand into his own rumah) | null
+   *   powers [p0, p1] hero passives: 'tuah' (keris steals) | null
    */
   function createGame(first = 0, opts = {}) {
     const holes = new Array(SIZE).fill(START_SEEDS);
@@ -71,6 +78,7 @@
     const fx = newFx();
     if (opts.powers) fx.powers = opts.powers.slice();
     if (opts.keris !== undefined && opts.keris >= 0) fx.keris = opts.keris;
+    if (opts.tipu) fx.tipu = opts.tipu.map((b) => (b ? 1 : 0));
     return {
       holes,
       burnt,
@@ -95,28 +103,25 @@
       single: s.single,
       fx: {
         shadow: f.shadow.slice(), lightning: f.lightning.slice(), shield: f.shield.slice(),
-        time: f.time.slice(), frozen: f.frozen.slice(), keris: f.keris,
+        time: f.time.slice(), frozen: f.frozen.slice(), keris: f.keris, tipu: f.tipu, rock: f.rock, rockTurns: f.rockTurns,
         powers: f.powers, combo: f.combo.slice(), steals: f.steals.slice(),
       },
     };
   }
 
-  /** Kekuatan Badang: does this drop in p's own rumah get a 2nd seed from the hand? (max BADANG_MAX a turn) */
-  const badangDouble = (fx, p, pos, seedsLeft, used) =>
-    pos === STORE[p] && seedsLeft > 0 && fx.powers && fx.powers[p] === 'badang' && used < BADANG_MAX;
-
-  function nextPos(pos, p, burnt, shadow) {
+  // rock = a hole under Badang's rock: everyone's sowing skips it
+  function nextPos(pos, p, burnt, shadow, rock = -1) {
     do {
       pos = (pos + 1) % SIZE;
-    } while (pos === STORE[1 - p] || burnt[pos] || (shadow && ownerOf(pos) !== p));
+    } while (pos === STORE[1 - p] || burnt[pos] || (shadow && ownerOf(pos) !== p) || pos === rock);
     return pos;
   }
 
   function legalMoves(s, p = s.player) {
     if (s.phase !== 'play') return [];
     const all = sidePits(p).filter((i) => !s.burnt[i] && s.holes[i] > 0);
-    // Frozen holes can't be picked — unless they are all that's left
-    const free = all.filter((i) => !s.fx.frozen[i]);
+    // Frozen or rock-covered holes can't be picked — unless they are all that's left
+    const free = all.filter((i) => !s.fx.frozen[i] && i !== s.fx.rock);
     return free.length ? free : all;
   }
 
@@ -160,17 +165,16 @@
 
     for (;;) {
       while (seeds > 0) {
-        pos = nextPos(pos, p, st.burnt, shadow);
+        pos = nextPos(pos, p, st.burnt, shadow, fx.rock);
         st.holes[pos]++;
         seeds--;
         steps++;
         if (ev) ev.push({ t: 'drop', pos, hand: seeds });
-        // Kekuatan Badang: passing his own rumah he drops a 2nd seed there, from his hand
-        if (badangDouble(fx, p, pos, seeds, fx.steals[p])) {
-          st.holes[pos]++;
-          seeds--;
-          fx.steals[p]++;
-          if (ev) ev.push({ t: 'bonus', pos, hand: seeds });
+        // Main Tipu: sneaks 1-2 extra seeds into his own rumah; his hand doesn't go down for them
+        if (pos === STORE[p] && fx.tipu[p]) {
+          const n = 1 + (st.holes[pos] % 2);
+          st.holes[pos] += n;
+          if (ev) ev.push({ t: 'cheat', pos, n });
         }
       }
 
@@ -196,7 +200,9 @@
       // Last seed in an empty kampung on own side: tembak (capture)
       if (ownerOf(pos) === p && st.holes[pos] === 1) {
         const o = opposite(pos);
-        if (st.holes[o] > 0 && fx.shield[1 - p]) {
+        if (o === fx.rock) {
+          // under Badang's rock: nothing can be taken from it, the seed just stays
+        } else if (st.holes[o] > 0 && fx.shield[1 - p]) {
           if (ev) ev.push({ t: 'blocked', pos, opp: o });
         } else if (st.holes[o] > 0) {
           let n = st.holes[o] + 1;
@@ -206,7 +212,7 @@
           if (fx.lightning[p]) {
             fx.lightning[p] = 0;
             for (const k of [o - 1, o + 1]) {
-              if (ownerOf(k) === 1 - p && !isStore(k) && !st.burnt[k] && st.holes[k] > 0) {
+              if (ownerOf(k) === 1 - p && !isStore(k) && !st.burnt[k] && k !== fx.rock && st.holes[k] > 0) {
                 n += st.holes[k];
                 st.holes[k] = 0;
                 extra.push(k);
@@ -235,12 +241,25 @@
       fx.combo[p] = 0;
       fx.steals[p] = 0;
       if (p === 0 && fx.keris >= 0) kerisStab(st, ev);
+      // Badang's rock lifts after its owner has had rockTurns turns under it
+      if (fx.rock >= 0 && ownerOf(fx.rock) === p && --fx.rockTurns <= 0) {
+        if (ev) ev.push({ t: 'rockGone', pos: fx.rock });
+        fx.rock = -1;
+      }
       for (const i of sidePits(p)) if (fx.frozen[i]) fx.frozen[i]--;
       st.player = 1 - p;
     }
 
     checkEnd(st, ev);
     return { state: st, events: ev, result };
+  }
+
+  /** Batu Badang: drop a rock on hole `pos` for `turns` of its owner's turns. Returns { state, events }. */
+  function throwRock(s, pos, turns = 2) {
+    const st = clone(s);
+    st.fx.rock = pos;
+    st.fx.rockTurns = turns;
+    return { state: st, events: [{ t: 'rock', pos }] };
   }
 
   /** Taming Sari: stab the hole under the keris (seeds to player 1's rumah), then move one hole along. */
@@ -271,14 +290,13 @@
     let seeds = holes[pit];
     holes[pit] = 0;
     let pos = pit;
-    let used = s.fx.steals ? s.fx.steals[p] : 0;
     while (seeds > 0) {
-      pos = nextPos(pos, p, s.burnt, s.fx.shadow[p]);
+      pos = nextPos(pos, p, s.burnt, s.fx.shadow[p], s.fx.rock);
       holes[pos]++;
       seeds--;
-      if (badangDouble(s.fx, p, pos, seeds, used)) { holes[pos]++; seeds--; used++; } // same as playMove
     }
-    return { pos, count: holes[pos], opposite: isStore(pos) ? 0 : holes[opposite(pos)] };
+    // a hole under Badang's rock can't be captured, so it counts as empty here
+    return { pos, count: holes[pos], opposite: isStore(pos) || opposite(pos) === s.fx.rock ? 0 : holes[opposite(pos)] };
   }
 
   /**
@@ -338,7 +356,7 @@
   const api = {
     PITS, START_SEEDS, STORE, SIZE,
     sidePits, ownerOf, isStore, opposite,
-    createGame, clone, legalMoves, playMove, startNextRound, checkEnd, firstLanding,
+    createGame, clone, legalMoves, playMove, startNextRound, checkEnd, firstLanding, throwRock,
     sideTotal, totalOf,
   };
 
